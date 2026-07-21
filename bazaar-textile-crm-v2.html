@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bazaar Textile CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root {
+  --black: #111110;
+  --dark: #1C1B19;
+  --charcoal: #2E2D2A;
+  --mid: #5C5A54;
+  --muted: #9C9A93;
+  --light: #D4D1C8;
+  --pale: #EEECE6;
+  --cream: #F7F5F0;
+  --white: #FFFFFF;
+
+  --warm-orange: #C8864A;
+  --warm-orange-h: #B5733A;
+  --warm-gold: #D4A55A;
+  --warm-sand: #E8D5B0;
+  --warm-linen: #F2E8D8;
+  --warm-deep: #7A4E2A;
+
+  --success: #3D8A5E;
+  --success-bg: #EBF5F0;
+  --warning: #A0712A;
+  --warning-bg: #FBF3E3;
+  --danger: #B8392A;
+  --danger-bg: #FAEDEB;
+  --info: #2A6A9A;
+  --info-bg: #E8F2FA;
+
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --shadow-sm: 0 1px 3px rgba(17,17,16,0.08);
+  --shadow: 0 2px 8px rgba(17,17,16,0.10);
+  --shadow-lg: 0 8px 32px rgba(17,17,16,0.14);
+
+  --sidebar-w: 220px;
+  --sidebar-w-collapsed: 60px;
+  --topbar-h: 56px;
+  --transition: 0.22s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 14px;
+  color: var(--dark);
+  background: var(--cream);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============ SCROLLBAR ============ */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--light); border-radius: 2px; }
+
+/* ============ UTILS ============ */
+.hidden { display: none !important; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-4 { gap: 4px; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.text-muted { color: var(--muted); }
+.text-sm { font-size: 12px; }
+.text-xs { font-size: 11px; }
+.font-500 { font-weight: 500; }
+.w-full { width: 100%; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ============ BADGE ============ */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 20px;
+  font-size: 11px; font-weight: 500; white-space: nowrap;
+}
+.badge-success { background: var(--success-bg); color: var(--success); }
+.badge-warning { background: var(--warning-bg); color: var(--warning); }
+.badge-danger { background: var(--danger-bg); color: var(--danger); }
+.badge-info { background: var(--info-bg); color: var(--info); }
+.badge-neutral { background: var(--pale); color: var(--mid); }
+.badge-admin { background: #2E2D2A; color: #E8D5B0; }
+.badge-super { background: #7A4E2A; color: #F2E8D8; }
+
+/* ============ BUTTON ============ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 16px; border-radius: var(--radius); border: none; cursor: pointer;
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  transition: all var(--transition); text-decoration: none; white-space: nowrap;
+}
+.btn-primary {
+  background: var(--warm-orange); color: var(--white);
+}
+.btn-primary:hover { background: var(--warm-orange-h); }
+.btn-secondary {
+  background: var(--white); color: var(--dark);
+  border: 1px solid var(--light);
+}
+.btn-secondary:hover { background: var(--cream); border-color: var(--muted); }
+.btn-ghost { background: transparent; color: var(--mid); }
+.btn-ghost:hover { background: var(--pale); color: var(--dark); }
+.btn-danger-outline { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+.btn-danger-outline:hover { background: var(--danger-bg); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-icon {
+  padding: 7px; border-radius: var(--radius); background: transparent;
+  border: none; cursor: pointer; color: var(--mid);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+}
+.btn-icon:hover { background: var(--pale); color: var(--dark); }
+.btn-icon svg { width: 16px; height: 16px; }
+
+/* ============ FORM ============ */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; font-weight: 500; color: var(--charcoal); }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 9px 12px;
+  border: 1px solid var(--light); border-radius: var(--radius);
+  background: var(--white); color: var(--dark);
+  font-family: inherit; font-size: 13px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--warm-orange); box-shadow: 0 0 0 3px rgba(200,134,74,0.12);
+}
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-hint { font-size: 11px; color: var(--muted); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+/* ============ CARD ============ */
+.card {
+  background: var(--white); border-radius: var(--radius-lg);
+  border: 1px solid var(--pale); padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.card-title {
+  font-size: 14px; font-weight: 600; color: var(--dark);
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+
+/* ============ TABLE ============ */
+.table-wrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; }
+.table th {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--pale);
+  text-align: left; white-space: nowrap; background: var(--cream);
+}
+.table td {
+  padding: 12px 14px; border-bottom: 1px solid var(--pale);
+  font-size: 13px; color: var(--dark); vertical-align: middle;
+}
+.table tr:last-child td { border-bottom: none; }
+.table tbody tr { transition: background var(--transition); cursor: pointer; }
+.table tbody tr:hover { background: var(--cream); }
+
+/* ============ STAT CARD ============ */
+.stat-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;
+}
+@media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; } }
+
+.stat-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  border: 1px solid var(--pale); padding: 18px 20px;
+  box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+}
+.stat-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 40px; height: 3px; border-radius: 0 2px 0 0;
+  background: var(--warm-orange);
+}
+.stat-num {
+  font-size: 28px; font-weight: 600; color: var(--black);
+  font-feature-settings: "tnum"; line-height: 1.1;
+}
+.stat-lbl {
+  font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 400;
+}
+.stat-sub {
+  font-size: 11px; color: var(--success); margin-top: 6px; display: flex; align-items: center; gap: 3px;
+}
+
+/* ============ LOGIN PAGE ============ */
+#page-login {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: var(--black);
+  position: relative; overflow: hidden;
+}
+.login-bg-texture {
+  position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(200,134,74,0.04) 60px, rgba(200,134,74,0.04) 61px),
+    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(200,134,74,0.04) 60px, rgba(200,134,74,0.04) 61px);
+}
+.login-side {
+  position: absolute; right: 0; top: 0; bottom: 0; width: 42%;
+  background: var(--warm-deep); opacity: 0.15; clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+}
+.login-box {
+  position: relative; z-index: 10;
+  width: 100%; max-width: 400px; margin: 20px;
+  background: var(--dark); border-radius: var(--radius-xl);
+  border: 1px solid var(--charcoal); box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+.login-header {
+  padding: 32px 32px 24px;
+  border-bottom: 1px solid var(--charcoal);
+}
+.login-logo {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+}
+.login-logo-mark {
+  width: 42px; height: 42px; border-radius: var(--radius); overflow: hidden;
+  background: var(--warm-orange); display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--white);
+  flex-shrink: 0;
+}
+.login-logo-mark img, .sidebar-logo-mark img { width: 100%; height: 100%; object-fit: cover; }
+.login-logo-text { display: flex; flex-direction: column; }
+.login-logo-name {
+  font-size: 16px; font-weight: 600; color: var(--white); letter-spacing: 0.02em;
+}
+.login-logo-sub {
+  font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 1px;
+}
+.login-headline {
+  font-size: 13px; color: var(--muted); line-height: 1.5;
+}
+.login-form-area { padding: 24px 32px 28px; }
+.login-form-group { margin-bottom: 16px; }
+.login-label { font-size: 11px; font-weight: 500; color: var(--muted); margin-bottom: 6px; display: block; letter-spacing: 0.04em; text-transform: uppercase; }
+.login-input {
+  width: 100%; padding: 11px 14px;
+  background: var(--charcoal); border: 1px solid #3D3C38; border-radius: var(--radius);
+  color: var(--white); font-family: inherit; font-size: 14px; outline: none;
+  transition: border-color var(--transition);
+}
+.login-input::placeholder { color: var(--mid); }
+.login-input:focus { border-color: var(--warm-orange); }
+.login-btn {
+  width: 100%; padding: 12px; border: none; border-radius: var(--radius);
+  background: var(--warm-orange); color: var(--white);
+  font-family: inherit; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background var(--transition); margin-top: 8px;
+}
+.login-btn:hover { background: var(--warm-orange-h); }
+.login-error {
+  color: #F08070; font-size: 12px; margin-top: 10px; display: none; text-align: center;
+}
+.login-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 32px; border-top: 1px solid var(--charcoal);
+}
+.lang-toggle {
+  display: flex; gap: 2px; background: var(--charcoal);
+  border-radius: var(--radius-sm); padding: 2px;
+}
+.lang-btn {
+  padding: 3px 10px; border-radius: 3px; font-size: 11px; font-weight: 500;
+  cursor: pointer; transition: all var(--transition); color: var(--muted); border: none; background: transparent;
+  font-family: inherit;
+}
+.lang-btn.active { background: var(--dark); color: var(--white); }
+.login-policies { display: flex; gap: 12px; }
+.policy-link {
+  font-size: 11px; color: var(--mid); cursor: pointer; text-decoration: none;
+  transition: color var(--transition);
+}
+.policy-link:hover { color: var(--warm-gold); }
+
+/* ============ APP SHELL ============ */
+#app-shell { display: none; min-height: 100vh; }
+#app-shell.visible { display: flex; }
+
+/* ============ SIDEBAR ============ */
+.sidebar {
+  width: var(--sidebar-w); background: var(--black); flex-shrink: 0;
+  display: flex; flex-direction: column;
+  transition: width var(--transition), transform var(--transition);
+  position: fixed; left: 0; top: 0; bottom: 0; z-index: 100;
+  overflow: hidden;
+}
+.sidebar.collapsed { width: var(--sidebar-w-collapsed); }
+
+.sidebar-brand {
+  padding: 18px 16px 14px; border-bottom: 1px solid var(--charcoal);
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.sidebar-logo-mark {
+  width: 30px; height: 30px; border-radius: var(--radius-sm); overflow: hidden;
+  background: var(--warm-orange); display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--white);
+  flex-shrink: 0;
+}
+.sidebar-brand-text { overflow: hidden; }
+.sidebar-brand-name { font-size: 13px; font-weight: 600; color: var(--white); white-space: nowrap; }
+.sidebar-brand-sub { font-size: 10px; color: var(--mid); white-space: nowrap; margin-top: 1px; }
+
+.sidebar-nav { flex: 1; padding: 12px 8px; overflow-y: auto; overflow-x: hidden; }
+.nav-section-label {
+  font-size: 10px; font-weight: 600; color: var(--mid); letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 8px 10px 4px; white-space: nowrap; overflow: hidden;
+  transition: opacity var(--transition);
+}
+.sidebar.collapsed .nav-section-label { opacity: 0; }
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: var(--radius);
+  color: var(--muted); cursor: pointer; margin-bottom: 2px;
+  transition: all var(--transition); white-space: nowrap; overflow: hidden;
+  position: relative;
+}
+.nav-item:hover { background: var(--charcoal); color: var(--light); }
+.nav-item.active { background: rgba(200,134,74,0.15); color: var(--warm-gold); }
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+  width: 2px; border-radius: 0 2px 2px 0; background: var(--warm-orange);
+}
+.nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+.nav-item-label { font-size: 13px; font-weight: 400; }
+
+.sidebar-bottom {
+  padding: 12px 8px; border-top: 1px solid var(--charcoal); flex-shrink: 0;
+}
+.sidebar-user {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: var(--radius); overflow: hidden;
+}
+.sidebar-avatar {
+  width: 30px; height: 30px; border-radius: 50%; background: var(--warm-orange);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: var(--white); flex-shrink: 0;
+}
+.avatar-edit-wrap { position: relative; flex-shrink: 0; cursor: pointer; }
+.avatar-edit-wrap .sidebar-avatar { overflow: hidden; }
+.avatar-edit-badge {
+  position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px;
+  border-radius: 50%; background: var(--warm-orange); border: 2px solid var(--dark);
+  display: flex; align-items: center; justify-content: center;
+}
+.avatar-edit-badge svg { width: 7px; height: 7px; stroke: var(--white); }
+.sidebar-user-info { overflow: hidden; }
+.sidebar-user-name { font-size: 12px; font-weight: 500; color: var(--light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-user-role { font-size: 10px; color: var(--mid); white-space: nowrap; }
+.sidebar-collapse-btn {
+  width: 100%; padding: 7px 10px; margin-top: 6px;
+  background: transparent; border: none; cursor: pointer; color: var(--mid);
+  display: flex; align-items: center; gap: 10px; border-radius: var(--radius);
+  transition: all var(--transition); font-family: inherit; font-size: 12px;
+  overflow: hidden; white-space: nowrap;
+}
+.sidebar-collapse-btn:hover { background: var(--charcoal); color: var(--light); }
+.sidebar-collapse-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+/* ============ MAIN AREA ============ */
+.main-area {
+  flex: 1; display: flex; flex-direction: column;
+  margin-left: var(--sidebar-w); transition: margin-left var(--transition);
+  min-width: 0;
+}
+.main-area.sidebar-collapsed { margin-left: var(--sidebar-w-collapsed); }
+
+/* ============ TOPBAR ============ */
+.topbar {
+  height: var(--topbar-h); background: var(--white);
+  border-bottom: 1px solid var(--pale);
+  display: flex; align-items: center; padding: 0 20px; gap: 12px;
+  position: sticky; top: 0; z-index: 50;
+  box-shadow: 0 1px 0 var(--pale);
+}
+.topbar-hamburger {
+  display: none; padding: 6px; border: none; background: transparent;
+  cursor: pointer; border-radius: var(--radius); color: var(--mid);
+}
+.topbar-hamburger svg { width: 20px; height: 20px; display: block; }
+.topbar-breadcrumb { display: flex; align-items: center; gap: 6px; flex: 1; }
+.topbar-title { font-size: 15px; font-weight: 600; color: var(--dark); }
+.topbar-sub { font-size: 12px; color: var(--muted); }
+.topbar-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.topbar-lang {
+  display: flex; gap: 2px; background: var(--pale); border-radius: var(--radius-sm); padding: 2px;
+}
+.topbar-lang-btn {
+  padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: 500;
+  cursor: pointer; transition: all var(--transition); color: var(--muted); border: none; background: transparent;
+  font-family: inherit;
+}
+.topbar-lang-btn.active { background: var(--white); color: var(--dark); box-shadow: var(--shadow-sm); }
+
+/* ============ PAGE CONTENT ============ */
+.page-content {
+  flex: 1; padding: 24px; overflow-y: auto;
+}
+@media (max-width: 768px) { .page-content { padding: 16px; } }
+@media (max-width: 480px) { .page-content { padding: 12px; } }
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+}
+.page-header-left { display: flex; flex-direction: column; gap: 2px; }
+.page-h1 { font-size: 20px; font-weight: 600; color: var(--black); }
+.page-desc { font-size: 13px; color: var(--muted); }
+
+/* ============ SEARCH & FILTER ============ */
+.search-bar {
+  display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+}
+.search-input-wrap { position: relative; flex: 1; min-width: 200px; }
+.search-input-wrap svg {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; color: var(--muted); pointer-events: none;
+}
+.search-input {
+  width: 100%; padding: 9px 12px 9px 34px;
+  border: 1px solid var(--light); border-radius: var(--radius);
+  background: var(--white); font-family: inherit; font-size: 13px; outline: none;
+  transition: border-color var(--transition);
+}
+.search-input:focus { border-color: var(--warm-orange); }
+.filter-select {
+  padding: 8px 12px; border: 1px solid var(--light); border-radius: var(--radius);
+  background: var(--white); font-family: inherit; font-size: 13px; outline: none; cursor: pointer; color: var(--dark);
+}
+.filter-select:focus { border-color: var(--warm-orange); }
+
+/* ============ CUSTOMER AVATAR ============ */
+.cust-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--white); flex-shrink: 0;
+}
+.avatar-colors {
+  --c0: #C8864A; --c1: #5C8A6A; --c2: #4A70A8; --c3: #9A5E9A; --c4: #7A6A4A; --c5: #5A8A9A;
+}
+
+/* ============ DETAIL PANEL ============ */
+.detail-panel {
+  position: fixed; right: 0; top: 0; bottom: 0;
+  width: 420px; max-width: 95vw;
+  background: var(--white); border-left: 1px solid var(--pale);
+  box-shadow: var(--shadow-lg); z-index: 200;
+  display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform 0.3s ease;
+}
+.detail-panel.open { transform: translateX(0); }
+.detail-panel-overlay {
+  position: fixed; inset: 0; background: rgba(17,17,16,0.4);
+  z-index: 199; display: none;
+}
+.detail-panel-overlay.visible { display: block; }
+.detail-header {
+  padding: 18px 20px; border-bottom: 1px solid var(--pale);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+}
+.detail-company-name { font-size: 16px; font-weight: 600; color: var(--black); }
+.detail-meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.detail-body { flex: 1; overflow-y: auto; padding: 20px; }
+.detail-section { margin-bottom: 24px; }
+.detail-section-title {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--pale);
+}
+.detail-field { display: flex; gap: 8px; margin-bottom: 10px; }
+.detail-field-label { font-size: 12px; color: var(--muted); width: 80px; flex-shrink: 0; padding-top: 1px; }
+.detail-field-val { font-size: 13px; color: var(--dark); flex: 1; }
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.timeline-item {
+  display: flex; gap: 12px; padding-bottom: 16px; position: relative;
+}
+.timeline-item::before {
+  content: ''; position: absolute; left: 7px; top: 18px; bottom: 0;
+  width: 1px; background: var(--pale);
+}
+.timeline-item:last-child::before { display: none; }
+.timeline-dot {
+  width: 16px; height: 16px; border-radius: 50%; background: var(--warm-sand);
+  border: 2px solid var(--warm-orange); flex-shrink: 0; margin-top: 2px;
+}
+.timeline-content { flex: 1; min-width: 0; }
+.timeline-date { font-size: 11px; color: var(--muted); }
+.timeline-text { font-size: 13px; color: var(--dark); margin-top: 2px; }
+.detail-footer {
+  padding: 14px 20px; border-top: 1px solid var(--pale);
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+
+/* ============ MODAL ============ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(17,17,16,0.5);
+  z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--white); border-radius: var(--radius-xl);
+  padding: 28px; max-width: 560px; width: 100%;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.modal-title { font-size: 16px; font-weight: 600; color: var(--black); }
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+/* ============ POLICY MODAL ============ */
+.policy-content { font-size: 13px; color: var(--dark); line-height: 1.8; max-height: 60vh; overflow-y: auto; }
+.policy-content h3 { font-size: 14px; font-weight: 600; margin: 16px 0 6px; color: var(--black); }
+.policy-content p { margin-bottom: 10px; color: var(--mid); }
+
+/* ============ MOBILE OVERLAY NAV ============ */
+.sidebar-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99;
+  display: none;
+}
+.sidebar-overlay.visible { display: block; }
+
+/* ============ TOAST ============ */
+.toast-container {
+  position: fixed; bottom: 24px; right: 24px; z-index: 1000;
+  display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
+}
+.toast {
+  background: var(--dark); color: var(--white);
+  padding: 11px 16px; border-radius: var(--radius);
+  font-size: 13px; box-shadow: var(--shadow-lg);
+  display: flex; align-items: center; gap: 8px;
+  animation: slideIn 0.3s ease;
+  border-left: 3px solid var(--warm-orange);
+}
+.toast.success { border-left-color: var(--success); }
+.toast.danger { border-left-color: var(--danger); }
+@keyframes slideIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ============ PROGRESS BAR FAKE ============ */
+.progress-wrap { background: var(--pale); border-radius: 4px; height: 6px; overflow: hidden; }
+.progress-bar { height: 100%; border-radius: 4px; background: var(--warm-orange); transition: width 0.3s; }
+
+/* ============ RESPONSIVE BREAKPOINTS ============ */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: var(--sidebar-w) !important;
+    box-shadow: var(--shadow-lg);
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .main-area { margin-left: 0 !important; }
+  .topbar-hamburger { display: flex; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .detail-panel { width: 100%; }
+  .topbar-lang { display: none; }
+  .page-header { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 480px) {
+  .stat-grid { gap: 10px; }
+  .stat-num { font-size: 22px; }
+  .page-h1 { font-size: 17px; }
+  .modal { padding: 20px; }
+  .login-box { margin: 12px; }
+  .login-header, .login-form-area { padding-left: 20px; padding-right: 20px; }
+  .login-footer { padding-left: 20px; padding-right: 20px; flex-wrap: wrap; gap: 8px; }
+}
+
+/* ============ EMPTY STATE ============ */
+.empty-state {
+  text-align: center; padding: 60px 20px; color: var(--muted);
+}
+.empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.4; }
+.empty-title { font-size: 15px; font-weight: 500; color: var(--mid); margin-bottom: 6px; }
+.empty-desc { font-size: 13px; }
+
+/* ============ TABS ============ */
+.tab-list {
+  display: flex; gap: 0; border-bottom: 1px solid var(--pale); margin-bottom: 24px; overflow-x: auto;
+}
+.tab-item {
+  padding: 10px 18px; font-size: 13px; font-weight: 500; color: var(--muted);
+  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: all var(--transition); white-space: nowrap;
+}
+.tab-item:hover { color: var(--dark); }
+.tab-item.active { color: var(--warm-orange); border-bottom-color: var(--warm-orange); }
+
+/* ============ ACCOUNT CARD ============ */
+.account-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; border-radius: var(--radius); border: 1px solid var(--pale);
+  margin-bottom: 8px; background: var(--white);
+  transition: border-color var(--transition);
+}
+.account-row:hover { border-color: var(--light); }
+.account-actions { margin-left: auto; display: flex; gap: 6px; }
+
+/* ============ SETTINGS SECTION ============ */
+.settings-card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--pale); overflow: hidden; margin-bottom: 20px; }
+.settings-card-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--pale);
+  background: var(--cream); display: flex; align-items: center; gap: 10px;
+}
+.settings-card-title { font-size: 14px; font-weight: 600; color: var(--dark); }
+.settings-card-body { padding: 20px; }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN PAGE ============ -->
+<div id="page-login">
+  <div class="login-bg-texture"></div>
+  <div class="login-side"></div>
+  <div class="login-box">
+    <div class="login-header">
+      <div class="login-logo">
+        <div class="login-logo-mark" id="login-logo-mark">B</div>
+        <div class="login-logo-text">
+          <div class="login-logo-name" id="login-company-name">Bazaar Textile</div>
+          <div class="login-logo-sub" id="login-company-sub">CRM Management System</div>
+        </div>
+      </div>
+      <div class="login-headline" id="login-tagline" style="font-size:12px; color:#5C5A54;">
+        Down jacket &amp; outdoor sportswear fabric specialists
+      </div>
+    </div>
+    <div class="login-form-area">
+      <div class="login-form-group">
+        <label class="login-label" id="lbl-username">Username</label>
+        <input class="login-input" id="login-username" type="text" placeholder="Enter your username" autocomplete="username">
+      </div>
+      <div class="login-form-group">
+        <label class="login-label" id="lbl-password">Password</label>
+        <input class="login-input" id="login-password" type="password" placeholder="Enter your password" autocomplete="current-password">
+      </div>
+      <button class="login-btn" id="lbl-login-btn" onclick="doLogin()">Sign In</button>
+      <div class="login-error" id="login-error">Incorrect username or password</div>
+    </div>
+    <div class="login-footer">
+      <div class="lang-toggle">
+        <button class="lang-btn" onclick="setLang('zh')">中文</button>
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      </div>
+      <div class="login-policies">
+        <a class="policy-link" onclick="showPolicy('privacy')" id="lbl-privacy">Privacy Policy</a>
+        <a class="policy-link" onclick="showPolicy('security')" id="lbl-security">Security Policy</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="app-shell">
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo-mark" id="sidebar-logo-mark">B</div>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-brand-name">Bazaar Textile</div>
+        <div class="sidebar-brand-sub">CRM System</div>
+      </div>
+    </div>
+
+    <div class="sidebar-nav" id="sidebar-nav">
+      <!-- Nav items injected by JS -->
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="avatar-edit-wrap" onclick="openAvatarUpload()" title="Change avatar">
+          <div class="sidebar-avatar" id="sidebar-avatar-initials">A</div>
+          <div class="avatar-edit-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
+          </div>
+        </div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-username">Admin</div>
+          <div class="sidebar-user-role" id="sidebar-role">Super Admin</div>
+        </div>
+      </div>
+      <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarFile(this)">
+      <button class="sidebar-collapse-btn" onclick="toggleSidebar()" id="collapse-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 9l-3 3 3 3"/>
+        </svg>
+        <span class="sidebar-collapse-label">Collapse</span>
+      </button>
+      <button class="sidebar-collapse-btn" onclick="doLogout()" style="margin-top:2px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span class="sidebar-collapse-label" id="lbl-logout">Sign Out</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Area -->
+  <div class="main-area" id="main-area">
+    <!-- Topbar -->
+    <div class="topbar">
+      <button class="topbar-hamburger" onclick="toggleMobileSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <div class="topbar-breadcrumb">
+        <span class="topbar-title" id="topbar-title">Dashboard</span>
+      </div>
+      <div class="topbar-actions">
+        <div class="topbar-lang">
+          <button class="topbar-lang-btn" onclick="setLang('zh')">中文</button>
+          <button class="topbar-lang-btn active" onclick="setLang('en')">EN</button>
+        </div>
+        <button class="btn-icon" onclick="doLogout()" title="Sign Out">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Page Content -->
+    <div class="page-content" id="page-content">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ============ DETAIL PANEL ============ -->
+<div class="detail-panel-overlay" id="detail-overlay" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-header">
+    <div>
+      <div class="detail-company-name" id="detail-company"></div>
+      <div class="detail-meta" id="detail-meta"></div>
+    </div>
+    <button class="btn-icon" onclick="closeDetail()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="detail-body" id="detail-body"></div>
+  <div class="detail-footer" id="detail-footer"></div>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-overlay" id="modal-overlay" onclick="e => { if(e.target===this) closeModal() }">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Modal</div>
+      <button class="btn-icon" onclick="closeModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+/* ============================================================
+   DATA STORE
+   ============================================================ */
+const STATE = {
+  currentUser: null,
+  lang: 'en',
+  sidebarCollapsed: false,
+  currentPage: 'dashboard',
+
+  settings: {
+    companyName: 'Bazaar Textile',
+    companySub: 'CRM Management System',
+    logo: null,
+    tagline: 'Down jacket & outdoor sportswear fabric specialists',
+    headerText: 'Bazaar Textile — Global Fabric Solutions',
+    footerText: '© 2025 Bazaar Textile Co., Ltd. All rights reserved.',
+    privacyPolicy: `<h3>Privacy Policy</h3><p>Last updated: January 2025</p><h3>1. Information We Collect</h3><p>Bazaar Textile CRM collects business contact information, company details, and transaction records entered by authorized users for the purpose of customer relationship management.</p><h3>2. How We Use Information</h3><p>All customer data is used solely for internal business operations including sales tracking, follow-up communications, and business analytics. We do not sell or share customer data with third parties.</p><h3>3. Data Protection</h3><p>Customer information is stored securely with access restricted to authorized personnel only. All data transmissions use industry-standard encryption protocols.</p><h3>4. User Rights</h3><p>Users may request to view, correct, or delete their data by contacting the system administrator. Data retention follows applicable business regulations.</p><h3>5. Contact</h3><p>For privacy-related inquiries, contact: admin@bazaartextile.com</p>`,
+    securityPolicy: `<h3>Security Policy</h3><p>Last updated: January 2025</p><h3>1. Account Security</h3><p>All users must maintain confidential passwords. Passwords should be at least 8 characters and changed regularly. Sharing login credentials is strictly prohibited.</p><h3>2. Access Control</h3><p>The system enforces role-based access control. Administrators can view all customer records. Sales staff can only access customers assigned to them.</p><h3>3. Data Integrity</h3><p>Sales staff may add new customer records but cannot modify or delete existing records. Only administrators have full edit and delete privileges to maintain data integrity.</p><h3>4. Audit Log</h3><p>All login attempts and data modifications are logged with timestamps and user identification for security auditing purposes.</p><h3>5. Incident Reporting</h3><p>Any suspected security breach or unauthorized access should be reported immediately to the system administrator.</p>`
+  },
+
+  accounts: [
+    { id: 'admin', username: 'admin', password: 'basha2025', role: 'superadmin', name: 'System Admin', status: 'active', createdAt: '2025-01-01', avatar: null },
+    { id: 'mgr01', username: 'manager01', password: 'mgr@2025', role: 'admin', name: 'Manager Li', status: 'active', createdAt: '2025-01-01', avatar: null },
+    { id: 'sales01', username: 'sales_wang', password: 'sales@2025', role: 'sales', name: 'Wang Lei', status: 'active', createdAt: '2025-01-01', avatar: null },
+    { id: 'sales02', username: 'sales_li', password: 'sales@2025', role: 'sales', name: 'Li Na', status: 'active', createdAt: '2025-01-10', avatar: null },
+    { id: 'sales03', username: 'sales_zhang', password: 'sales@2025', role: 'sales', name: 'Zhang Wei', status: 'active', createdAt: '2025-01-15', avatar: null }
+  ],
+
+  customers: [
+    { id: 'c001', company: 'North Face Sourcing Ltd.', country: 'USA', type: 'Brand', contact: 'Michael Chen', email: 'mchen@northface.com', phone: '+1-415-555-0182', wechat: '', status: 'closed', product: 'Down jacket fabric', salesId: 'sales01', note: 'Long-term partner, prefers 90g/m² ripstop nylon', createdAt: '2024-06-15', timeline: [{ date: '2025-01-18', text: 'Confirmed Q2 order: 50,000 yards of 40D ripstop nylon' }, { date: '2024-12-05', text: 'Sent fabric swatches & technical specs for 2025 collection' }, { date: '2024-09-20', text: 'First meeting at China Sourcing Fair, strong interest shown' }] },
+    { id: 'c002', company: 'Alpine Sports GmbH', country: 'Germany', type: 'Importer', contact: 'Klaus Weber', email: 'k.weber@alpinesports.de', phone: '+49-89-555-0234', wechat: 'KlausW_DE', status: 'following', product: 'Outdoor sportswear fabric', salesId: 'sales01', note: 'Requires OEKO-TEX certification, prefers DWR-coated fabrics', createdAt: '2024-08-10', timeline: [{ date: '2025-01-10', text: 'Requested samples of 3-layer softshell fabric' }, { date: '2024-11-22', text: 'Video call: discussed DWR coating options and MOQ' }, { date: '2024-08-10', text: 'Inquiry via email from ISPO trade show contact' }] },
+    { id: 'c003', company: 'Tokyo Outdoor Co.', country: 'Japan', type: 'Retailer', contact: 'Yuki Tanaka', email: 'y.tanaka@tokyooutdoor.jp', phone: '+81-3-5555-0187', wechat: '', status: 'new', product: 'Down jacket fabric', salesId: 'sales02', note: 'Interested in lightweight 20D down-proof fabric', createdAt: '2025-01-08', timeline: [{ date: '2025-01-08', text: 'New inquiry from Alibaba — requesting price list for 20D fabric' }] },
+    { id: 'c004', company: 'Patagonia Europe BV', country: 'Netherlands', type: 'Brand', contact: 'Sara van Berg', email: 's.vanberg@patagonia.eu', phone: '+31-20-555-0145', wechat: '', status: 'following', product: 'Recycled outdoor fabric', salesId: 'sales02', note: 'Strict sustainability requirements, recycled PET preferred', createdAt: '2024-10-22', timeline: [{ date: '2025-01-05', text: 'Sent recycled rPET fabric spec sheet' }, { date: '2024-12-18', text: 'Requested GRS certification documentation' }, { date: '2024-10-22', text: 'Referral from existing client North Face' }] },
+    { id: 'c005', company: 'Montreal Outdoor Inc.', country: 'Canada', type: 'Distributor', contact: 'James Tremblay', email: 'j.tremblay@mtloutdoor.ca', phone: '+1-514-555-0267', wechat: 'JamesTCA', status: 'closed', product: 'Down jacket fabric', salesId: 'sales03', note: 'High-volume buyer, 3-year supply agreement signed', createdAt: '2024-03-20', timeline: [{ date: '2025-01-15', text: 'Annual review call: expanding order by 30% for 2025' }, { date: '2024-08-30', text: 'Signed 3-year supply agreement, 200,000 yards/year' }, { date: '2024-03-20', text: 'Cold outreach via LinkedIn, responded positively' }] },
+    { id: 'c006', company: 'Seoul Active Corp.', country: 'South Korea', type: 'Manufacturer', contact: 'Kim Ji-won', email: 'jiwon@seoulactive.kr', phone: '+82-2-555-0192', wechat: 'KimJiWon82', status: 'new', product: 'Sportswear knit fabric', salesId: 'sales03', note: 'Looking for quick-dry performance fabric', createdAt: '2025-01-12', timeline: [{ date: '2025-01-12', text: 'Email inquiry for performance sportswear knit samples' }] },
+    { id: 'c007', company: 'Berghaus Ltd.', country: 'UK', type: 'Brand', contact: 'Emma Thompson', email: 'e.thompson@berghaus.com', phone: '+44-191-555-0134', wechat: '', status: 'lost', product: 'Hardshell fabric', salesId: 'sales01', note: 'Lost to competitor on price — may revisit in 2025', createdAt: '2024-07-05', timeline: [{ date: '2024-10-14', text: 'Lost bid: competitor offered lower MOQ' }, { date: '2024-09-02', text: 'Second round of samples sent with revised pricing' }, { date: '2024-07-05', text: 'Initial contact via industry directory' }] },
+    { id: 'c008', company: 'Decathlon Sourcing', country: 'France', type: 'Retailer', contact: 'Pierre Martin', email: 'p.martin@decathlon.com', phone: '+33-1-555-0221', wechat: '', status: 'following', product: 'Value outdoor fabric', salesId: 'sales02', note: 'Mass market buyer, sensitive to pricing, large MOQ', createdAt: '2024-11-30', timeline: [{ date: '2025-01-03', text: 'Price negotiation in progress for Q2 bulk order' }, { date: '2024-12-10', text: 'Visited our factory in Zhejiang' }, { date: '2024-11-30', text: 'Trade show contact from Outdoor Retailer' }] }
+  ]
+};
+
+const TEXTS = {
+  en: {
+    dashboard: 'Dashboard', customers: 'Customers', followUp: 'Follow-Up', accounts: 'Accounts',
+    settings: 'Settings', signOut: 'Sign Out', superAdmin: 'Super Admin', admin: 'Admin', sales: 'Sales',
+    username: 'USERNAME', password: 'PASSWORD', login: 'Sign In', loginError: 'Incorrect username or password',
+    privacy: 'Privacy Policy', security: 'Security Policy',
+    totalCustomers: 'Total Customers', myCustomers: 'My Customers', activeDeals: 'Active Deals',
+    newThisMonth: 'New This Month', teamMembers: 'Team Members', pendingFollowUp: 'Pending Follow-Up',
+    searchPlaceholder: 'Search company, contact, country…', allStatus: 'All Status',
+    status_new: 'New', status_following: 'Following', status_closed: 'Closed', status_lost: 'Lost',
+    addCustomer: 'Add Customer', editCustomer: 'Edit Customer', deleteCustomer: 'Delete',
+    save: 'Save', cancel: 'Cancel', close: 'Close',
+    company: 'Company', country: 'Country', type: 'Type', contact: 'Contact', email: 'Email',
+    phone: 'Phone', wechat: 'WeChat / WhatsApp', status: 'Status', product: 'Product Interest',
+    assignTo: 'Assign To', note: 'Notes', timeline: 'Follow-Up History',
+    basicInfo: 'Basic Information', orderInfo: 'Order Information',
+    allTypes: 'All Types', brand: 'Brand', importer: 'Importer', retailer: 'Retailer',
+    manufacturer: 'Manufacturer', distributor: 'Distributor',
+    recentCustomers: 'Recent Customers', customersByStatus: 'Customers by Status',
+    nav_dashboard: 'Dashboard', nav_customers: 'Customers', nav_accounts: 'Accounts',
+    nav_settings: 'Settings', nav_followup: 'Follow-Up',
+    accountMgmt: 'Account Management', addAccount: 'Add Account',
+    accUsername: 'Username', accName: 'Full Name', accRole: 'Role', accStatus: 'Status',
+    accActions: 'Actions', accActive: 'Active', accDisabled: 'Disabled',
+    settingsTitle: 'System Settings', branding: 'Branding',
+    headerFooter: 'Header & Footer', policies: 'Policy Content',
+    companyNameLabel: 'Company Name', taglineLabel: 'Tagline',
+    headerTextLabel: 'Header Text', footerTextLabel: 'Footer Text',
+    privacyPolicyContent: 'Privacy Policy Content', securityPolicyContent: 'Security Policy Content',
+    saveSettings: 'Save Settings', settingsSaved: 'Settings saved',
+    customerAdded: 'Customer added successfully', customerSaved: 'Changes saved',
+    customerDeleted: 'Customer deleted', confirmDelete: 'Delete this customer?',
+    readOnly: 'You can add new customers. To edit or delete a record, please contact your administrator.',
+    collapse: 'Collapse', expand: 'Expand',
+    allCountries: 'All Countries', assignedTo: 'Assigned to',
+    newPassword: 'New Password', editAccount: 'Edit Account',
+    accountSaved: 'Account updated', accountAdded: 'Account added',
+    cannotEditSuperAdmin: 'Cannot modify super admin via this form',
+    companyLogo: 'Company Logo', uploadLogo: 'Upload Logo', removeLogo: 'Remove',
+    logoUpdated: 'Logo updated', avatarUpdated: 'Avatar updated',
+    exportCustomers: 'Export All (Excel)',
+    addFollowUp: 'Add Follow-Up', followUpText: 'Follow-Up Note', followUpDate: 'Date',
+    followUpAdded: 'Follow-up added', followUpDeleted: 'Follow-up deleted',
+    confirmDeleteFollowUp: 'Delete this follow-up record?',
+    noFollowUp: 'No follow-up records yet',
+    followUpNoteOnly: 'You can only add new follow-up notes here. To edit or delete existing records, please contact your administrator.',
+    by: 'by', writeFollowUpPlaceholder: 'What happened in this follow-up? e.g. call, sample sent, quotation...',
+    contactAdminDelete: 'Contact your administrator to edit or delete this'
+  },
+  zh: {
+    dashboard: '仪表盘', customers: '客户管理', followUp: '跟进提醒', accounts: '账号管理',
+    settings: '系统设置', signOut: '退出登录', superAdmin: '主管理员', admin: '副管理员', sales: '业务员',
+    username: '账号', password: '密码', login: '登录', loginError: '账号或密码错误',
+    privacy: '隐私政策', security: '安全政策',
+    totalCustomers: '全部客户', myCustomers: '我的客户', activeDeals: '成交客户',
+    newThisMonth: '本月新增', teamMembers: '团队成员', pendingFollowUp: '待跟进',
+    searchPlaceholder: '搜索公司、联系人、国家…', allStatus: '全部状态',
+    status_new: '新客户', status_following: '跟进中', status_closed: '已成交', status_lost: '已流失',
+    addCustomer: '新增客户', editCustomer: '编辑客户', deleteCustomer: '删除',
+    save: '保存', cancel: '取消', close: '关闭',
+    company: '公司名称', country: '国家/地区', type: '客户类型', contact: '联系人', email: '邮箱',
+    phone: '电话', wechat: '微信/WhatsApp', status: '状态', product: '意向产品',
+    assignTo: '负责业务员', note: '备注', timeline: '跟进记录',
+    basicInfo: '基本信息', orderInfo: '订单情况',
+    allTypes: '全部类型', brand: '品牌商', importer: '进口商', retailer: '零售商',
+    manufacturer: '制造商', distributor: '经销商',
+    recentCustomers: '最近客户', customersByStatus: '客户状态分布',
+    nav_dashboard: '仪表盘', nav_customers: '客户管理', nav_accounts: '账号管理',
+    nav_settings: '系统设置', nav_followup: '跟进提醒',
+    accountMgmt: '账号管理', addAccount: '新增账号',
+    accUsername: '账号', accName: '姓名', accRole: '角色', accStatus: '状态',
+    accActions: '操作', accActive: '启用', accDisabled: '停用',
+    settingsTitle: '系统设置', branding: '品牌定制',
+    headerFooter: '页眉页尾', policies: '政策文案',
+    companyNameLabel: '公司名称', taglineLabel: '业务简介',
+    headerTextLabel: '页眉文字', footerTextLabel: '页尾文字',
+    privacyPolicyContent: '隐私政策内容', securityPolicyContent: '安全政策内容',
+    saveSettings: '保存设置', settingsSaved: '设置已保存',
+    customerAdded: '客户添加成功', customerSaved: '修改已保存',
+    customerDeleted: '客户已删除', confirmDelete: '确定删除该客户？',
+    readOnly: '您可以新增客户，如需修改或删除已有资料，请联系管理员处理。',
+    collapse: '收起菜单', expand: '展开菜单',
+    allCountries: '全部国家', assignedTo: '负责人',
+    newPassword: '新密码', editAccount: '编辑账号',
+    accountSaved: '账号已更新', accountAdded: '账号已添加',
+    cannotEditSuperAdmin: '不可通过此表单修改主管理员',
+    companyLogo: '公司Logo', uploadLogo: '上传Logo', removeLogo: '移除',
+    logoUpdated: 'Logo已更新', avatarUpdated: '头像已更新',
+    exportCustomers: '导出全部客户(Excel)',
+    addFollowUp: '新增跟进记录', followUpText: '跟进内容', followUpDate: '日期',
+    followUpAdded: '跟进记录已添加', followUpDeleted: '跟进记录已删除',
+    confirmDeleteFollowUp: '确定删除该条跟进记录？',
+    noFollowUp: '暂无跟进记录',
+    followUpNoteOnly: '您只能在此新增跟进记录，如需修改或删除已有记录，请联系管理员处理。',
+    by: '记录人', writeFollowUpPlaceholder: '请填写本次跟进情况，如电话沟通、寄样、报价等...',
+    contactAdminDelete: '如需修改或删除，请联系管理员'
+  }
+};
+
+function t(key) { return TEXTS[STATE.lang][key] || TEXTS['en'][key] || key; }
+
+/* ============================================================
+   LANGUAGE
+   ============================================================ */
+function setLang(lang) {
+  STATE.lang = lang;
+  saveCRM();
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  // Login page labels
+  el('lbl-username').textContent = t('username');
+  el('lbl-password').textContent = t('password');
+  el('lbl-login-btn').textContent = t('login');
+  el('lbl-privacy').textContent = t('privacy');
+  el('lbl-security').textContent = t('security');
+  el('login-error').textContent = t('loginError');
+  // Toggle active states
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === (lang === 'zh' ? '中文' : 'EN'));
+  });
+  document.querySelectorAll('.topbar-lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === (lang === 'zh' ? '中文' : 'EN'));
+  });
+  // If logged in, refresh
+  if (STATE.currentUser) {
+    updateSidebarLabels();
+    renderPage(STATE.currentPage);
+  }
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function el(id) { return document.getElementById(id); }
+const CRM_STORAGE_KEY = 'bazaar_textile_crm_v1';
+function saveCRM() {
+  try {
+    const data = {
+      lang: STATE.lang,
+      settings: STATE.settings,
+      accounts: STATE.accounts,
+      customers: STATE.customers
+    };
+    localStorage.setItem(CRM_STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.warn('CRM save skipped:', e);
+  }
+}
+function loadCRM() {
+  try {
+    const raw = localStorage.getItem(CRM_STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data.lang) STATE.lang = data.lang;
+    if (data.settings) STATE.settings = { ...STATE.settings, ...data.settings };
+    if (Array.isArray(data.accounts) && data.accounts.length) STATE.accounts = data.accounts;
+    if (Array.isArray(data.customers)) STATE.customers = data.customers;
+  } catch (e) {
+    console.warn('CRM load skipped:', e);
+  }
+}
+function genId(prefix) { return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+// Migration: make sure every follow-up entry has an id + author, and every account has an avatar slot
+function normalizeData() {
+  STATE.accounts.forEach(a => { if (a.avatar === undefined) a.avatar = null; });
+  STATE.customers.forEach(c => {
+    if (!Array.isArray(c.timeline)) c.timeline = [];
+    c.timeline.forEach(tl => {
+      if (!tl.id) tl.id = genId('tl');
+      if (!tl.authorId) { tl.authorId = c.salesId; tl.authorName = salesName(c.salesId) || t('admin'); }
+      if (!tl.createdAt) tl.createdAt = tl.date;
+    });
+    // newest first
+    c.timeline.sort((a,b) => (b.createdAt||b.date).localeCompare(a.createdAt||a.date));
+  });
+}
+function renderLogo() {
+  const logo = STATE.settings.logo;
+  const html = logo ? `<img src="${logo}">` : 'B';
+  const l1 = el('login-logo-mark'), l2 = el('sidebar-logo-mark');
+  if (l1) l1.innerHTML = html;
+  if (l2) l2.innerHTML = html;
+}
+function avatarColor(str) {
+  const colors = ['#C8864A','#5C8A6A','#4A70A8','#9A5E9A','#7A6A4A','#5A8A9A','#A85E4A','#6A8A5A'];
+  let h = 0; for (let c of str) h = c.charCodeAt(0) + ((h << 5) - h);
+  return colors[Math.abs(h) % colors.length];
+}
+function initials(name) { return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2); }
+function statusBadge(status) {
+  const map = { new: 'info', following: 'warning', closed: 'success', lost: 'neutral' };
+  return `<span class="badge badge-${map[status]||'neutral'}">${t('status_'+status)||status}</span>`;
+}
+function roleBadge(role) {
+  if (role === 'superadmin') return `<span class="badge badge-super">${t('superAdmin')}</span>`;
+  if (role === 'admin') return `<span class="badge badge-admin">${t('admin')}</span>`;
+  return `<span class="badge badge-neutral">${t('sales')}</span>`;
+}
+function isAdmin() { return STATE.currentUser && (STATE.currentUser.role === 'admin' || STATE.currentUser.role === 'superadmin'); }
+function isSuperAdmin() { return STATE.currentUser && STATE.currentUser.role === 'superadmin'; }
+function visibleCustomers() {
+  if (isAdmin()) return STATE.customers;
+  return STATE.customers.filter(c => c.salesId === STATE.currentUser.id);
+}
+function salesName(id) {
+  const a = STATE.accounts.find(a => a.id === id);
+  return a ? a.name : id;
+}
+// Can the current user add a follow-up entry to this customer?
+function canAddFollowUp(c) {
+  if (!STATE.currentUser) return false;
+  if (isAdmin()) return true;
+  return c.salesId === STATE.currentUser.id;
+}
+// Only admins/superadmins may edit or delete follow-up entries
+function canManageFollowUp() { return isAdmin(); }
+function currentUserAvatarHTML(size) {
+  size = size || 32;
+  const u = STATE.currentUser;
+  if (!u) return '';
+  if (u.avatar) return `<img src="${u.avatar}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;display:block;">`;
+  return initials(u.name);
+}
+function accountAvatarHTML(acc, size) {
+  size = size || 32;
+  if (acc.avatar) return `<img src="${acc.avatar}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;display:block;">`;
+  return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${avatarColor(acc.name)};color:#fff;display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.4)}px;font-weight:600;">${initials(acc.name)}</div>`;
+}
+function renderSidebarAvatar() {
+  const u = STATE.currentUser;
+  if (!u) return;
+  const box = el('sidebar-avatar-initials');
+  if (!box) return;
+  if (u.avatar) { box.innerHTML = `<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover;">`; }
+  else { box.innerHTML = ''; box.textContent = initials(u.name); }
+}
+function openAvatarUpload() { el('avatar-file-input').click(); }
+function handleAvatarFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('Please select an image file', 'danger'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    // Downscale via canvas so large photos don't bloat storage
+    const img = new Image();
+    img.onload = function() {
+      const size = 160;
+      const canvas = document.createElement('canvas');
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const scale = Math.max(size / img.width, size / img.height);
+      const w = img.width * scale, h = img.height * scale;
+      ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+      const resized = canvas.toDataURL('image/jpeg', 0.85);
+      STATE.currentUser.avatar = resized;
+      const acc = STATE.accounts.find(a => a.id === STATE.currentUser.id);
+      if (acc) acc.avatar = resized;
+      saveCRM();
+      renderSidebarAvatar();
+      if (STATE.currentPage === 'accounts') renderAccounts();
+      showToast(t('avatarUpdated') || 'Avatar updated', 'success');
+    };
+    img.src = dataUrl;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+function showToast(msg, type = '') {
+  const d = document.createElement('div');
+  d.className = 'toast ' + type;
+  d.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${msg}`;
+  el('toast-container').appendChild(d);
+  setTimeout(() => d.remove(), 3200);
+}
+
+/* ============================================================
+   LOGIN / LOGOUT
+   ============================================================ */
+function doLogin() {
+  const u = el('login-username').value.trim();
+  const p = el('login-password').value;
+  const acc = STATE.accounts.find(a => a.username === u && a.password === p && a.status === 'active');
+  if (!acc) {
+    el('login-error').style.display = 'block';
+    el('login-username').style.borderColor = '#c0392b';
+    return;
+  }
+  STATE.currentUser = acc;
+  el('login-error').style.display = 'none';
+  el('page-login').style.display = 'none';
+  el('app-shell').classList.add('visible');
+  initApp();
+}
+el('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+function doLogout() {
+  STATE.currentUser = null;
+  el('app-shell').classList.remove('visible');
+  el('page-login').style.display = 'flex';
+  el('login-username').value = '';
+  el('login-password').value = '';
+  el('login-username').style.borderColor = '';
+}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+function buildNav() {
+  const items = [
+    { id: 'dashboard', icon: 'home', label: 'nav_dashboard' },
+    { id: 'customers', icon: 'users', label: 'nav_customers' },
+    { id: 'followup', icon: 'bell', label: 'nav_followup' },
+  ];
+  if (isAdmin()) {
+    items.push({ id: 'accounts', icon: 'shield', label: 'nav_accounts' });
+  }
+  if (isSuperAdmin()) {
+    items.push({ id: 'settings', icon: 'sliders', label: 'nav_settings' });
+  }
+  return items;
+}
+
+const NAV_ICONS = {
+  home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+  users: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
+  shield: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  sliders: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>`
+};
+
+function renderSidebar() {
+  const items = buildNav();
+  let html = '';
+  items.forEach(item => {
+    html += `<div class="nav-item${STATE.currentPage === item.id ? ' active' : ''}" onclick="navigate('${item.id}')">
+      ${NAV_ICONS[item.icon]}
+      <span class="nav-item-label">${t(item.label)}</span>
+    </div>`;
+  });
+  el('sidebar-nav').innerHTML = html;
+}
+
+function updateSidebarLabels() {
+  renderSidebar();
+  el('sidebar-username').textContent = STATE.currentUser.name;
+  el('sidebar-role').textContent = t(STATE.currentUser.role === 'superadmin' ? 'superAdmin' : STATE.currentUser.role === 'admin' ? 'admin' : 'sales');
+  renderSidebarAvatar();
+  el('lbl-logout').textContent = t('signOut');
+  el('sidebar-collapse-label') && (el('sidebar-collapse-label').textContent = STATE.sidebarCollapsed ? t('expand') : t('collapse'));
+}
+
+function toggleSidebar() {
+  STATE.sidebarCollapsed = !STATE.sidebarCollapsed;
+  el('sidebar').classList.toggle('collapsed', STATE.sidebarCollapsed);
+  el('main-area').classList.toggle('sidebar-collapsed', STATE.sidebarCollapsed);
+}
+function toggleMobileSidebar() {
+  el('sidebar').classList.toggle('mobile-open');
+  el('sidebar-overlay').classList.toggle('visible');
+}
+function closeMobileSidebar() {
+  el('sidebar').classList.remove('mobile-open');
+  el('sidebar-overlay').classList.remove('visible');
+}
+
+/* ============================================================
+   ROUTING
+   ============================================================ */
+function navigate(page) {
+  STATE.currentPage = page;
+  closeMobileSidebar();
+  renderSidebar();
+  renderPage(page);
+  el('topbar-title').textContent = t('nav_' + page) || t(page);
+}
+
+function renderPage(page) {
+  const pages = { dashboard: renderDashboard, customers: renderCustomers, followup: renderFollowUp, accounts: renderAccounts, settings: renderSettings };
+  if (pages[page]) pages[page]();
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+function renderDashboard() {
+  const all = visibleCustomers();
+  const thisMonth = all.filter(c => { const d = new Date(c.createdAt); const n = new Date(); return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear(); });
+  const closed = all.filter(c => c.status === 'closed');
+  const following = all.filter(c => c.status === 'following' || c.status === 'new');
+
+  const isAdm = isAdmin();
+  const activeAcc = STATE.accounts.filter(a => a.status === 'active' && a.role === 'sales').length;
+
+  const stats = isAdm ? [
+    { num: all.length, lbl: t('totalCustomers'), sub: `+${thisMonth.length} ${t('newThisMonth')}` },
+    { num: closed.length, lbl: t('activeDeals'), sub: `${Math.round(closed.length/Math.max(all.length,1)*100)}% conversion` },
+    { num: following.length, lbl: t('pendingFollowUp'), sub: 'Requiring attention' },
+    { num: activeAcc, lbl: t('teamMembers'), sub: 'Active sales staff' }
+  ] : [
+    { num: all.length, lbl: t('myCustomers'), sub: `+${thisMonth.length} ${t('newThisMonth')}` },
+    { num: closed.length, lbl: t('activeDeals'), sub: `${Math.round(closed.length/Math.max(all.length,1)*100)}% rate` },
+    { num: following.length, lbl: t('pendingFollowUp'), sub: 'Need follow-up' }
+  ];
+
+  const recent = [...all].sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt)).slice(0,6);
+
+  el('page-content').innerHTML = `
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-h1">${t('dashboard')}</div>
+        <div class="page-desc">${STATE.settings.companyName} · ${STATE.currentUser.name}</div>
+      </div>
+      ${isAdm ? `<button class="btn btn-primary" onclick="navigate('customers')">${t('addCustomer')}</button>` : ''}
+    </div>
+    <div class="stat-grid">
+      ${stats.map(s => `<div class="stat-card"><div class="stat-num">${s.num}</div><div class="stat-lbl">${s.lbl}</div><div class="stat-sub">${s.sub}</div></div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warm-orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        ${t('recentCustomers')}
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr>
+            <th>${t('company')}</th>
+            <th>${t('country')}</th>
+            <th>${t('contact')}</th>
+            <th>${t('product')}</th>
+            <th>${t('status')}</th>
+            ${isAdm ? `<th>${t('assignedTo')}</th>` : ''}
+          </tr></thead>
+          <tbody>
+            ${recent.map(c => `<tr onclick="openDetail('${c.id}')">
+              <td><div style="display:flex;align-items:center;gap:10px;">
+                <div class="cust-avatar" style="background:${avatarColor(c.company)}">${initials(c.company)}</div>
+                <div><div style="font-weight:500;">${c.company}</div><div style="font-size:11px;color:var(--muted);">${c.type}</div></div>
+              </div></td>
+              <td>${c.country}</td>
+              <td><div>${c.contact}</div><div style="font-size:11px;color:var(--muted);">${c.email}</div></td>
+              <td style="max-width:150px;" class="truncate">${c.product}</td>
+              <td>${statusBadge(c.status)}</td>
+              ${isAdm ? `<td>${salesName(c.salesId)}</td>` : ''}
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   CUSTOMERS
+   ============================================================ */
+let custFilters = { search: '', status: '', type: '', country: '' };
+
+function renderCustomers() {
+  const isAdm = isAdmin();
+  let list = visibleCustomers();
+
+  if (custFilters.search) {
+    const q = custFilters.search.toLowerCase();
+    list = list.filter(c => c.company.toLowerCase().includes(q) || c.contact.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.email.toLowerCase().includes(q));
+  }
+  if (custFilters.status) list = list.filter(c => c.status === custFilters.status);
+  if (custFilters.type) list = list.filter(c => c.type === custFilters.type);
+  if (custFilters.country) list = list.filter(c => c.country === custFilters.country);
+
+  const countries = [...new Set(visibleCustomers().map(c => c.country))].sort();
+
+  el('page-content').innerHTML = `
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-h1">${isAdm ? t('totalCustomers') : t('myCustomers')}</div>
+        <div class="page-desc">${list.length} ${t('totalCustomers').toLowerCase()}</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        ${isSuperAdmin() ? `<button class="btn btn-secondary" onclick="exportCustomersCSV()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          ${t('exportCustomers')}</button>` : ''}
+        <button class="btn btn-primary" onclick="openAddCustomer()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          ${t('addCustomer')}</button>
+      </div>
+    </div>
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" type="text" placeholder="${t('searchPlaceholder')}" value="${custFilters.search}" oninput="custFilters.search=this.value;renderCustomers()">
+      </div>
+      <select class="filter-select" onchange="custFilters.status=this.value;renderCustomers()">
+        <option value="">${t('allStatus')}</option>
+        <option value="new" ${custFilters.status==='new'?'selected':''}>${t('status_new')}</option>
+        <option value="following" ${custFilters.status==='following'?'selected':''}>${t('status_following')}</option>
+        <option value="closed" ${custFilters.status==='closed'?'selected':''}>${t('status_closed')}</option>
+        <option value="lost" ${custFilters.status==='lost'?'selected':''}>${t('status_lost')}</option>
+      </select>
+      <select class="filter-select" onchange="custFilters.type=this.value;renderCustomers()">
+        <option value="">${t('allTypes')}</option>
+        <option value="Brand" ${custFilters.type==='Brand'?'selected':''}>${t('brand')}</option>
+        <option value="Importer" ${custFilters.type==='Importer'?'selected':''}>${t('importer')}</option>
+        <option value="Retailer" ${custFilters.type==='Retailer'?'selected':''}>${t('retailer')}</option>
+        <option value="Manufacturer" ${custFilters.type==='Manufacturer'?'selected':''}>${t('manufacturer')}</option>
+        <option value="Distributor" ${custFilters.type==='Distributor'?'selected':''}>${t('distributor')}</option>
+      </select>
+      <select class="filter-select" onchange="custFilters.country=this.value;renderCustomers()">
+        <option value="">${t('allCountries')}</option>
+        ${countries.map(c => `<option value="${c}" ${custFilters.country===c?'selected':''}>${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="card" style="padding:0;">
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr>
+            <th>${t('company')}</th>
+            <th>${t('country')}</th>
+            <th>${t('contact')}</th>
+            <th>${t('product')}</th>
+            <th>${t('status')}</th>
+            ${isAdm ? `<th>${t('assignedTo')}</th>` : ''}
+            <th></th>
+          </tr></thead>
+          <tbody>
+            ${list.length === 0 ? `<tr><td colspan="${isAdm?7:6}" style="text-align:center;padding:40px;color:var(--muted);">No customers found</td></tr>` : ''}
+            ${list.map(c => `<tr onclick="openDetail('${c.id}')">
+              <td><div style="display:flex;align-items:center;gap:10px;">
+                <div class="cust-avatar" style="background:${avatarColor(c.company)}">${initials(c.company)}</div>
+                <div><div style="font-weight:500;font-size:13px;">${c.company}</div><div style="font-size:11px;color:var(--muted);">${c.type}</div></div>
+              </div></td>
+              <td style="white-space:nowrap;">${c.country}</td>
+              <td><div style="font-size:13px;">${c.contact}</div><div style="font-size:11px;color:var(--muted);">${c.email}</div></td>
+              <td style="max-width:140px;"><div class="truncate" style="font-size:12px;">${c.product}</div></td>
+              <td>${statusBadge(c.status)}</td>
+              ${isAdm ? `<td style="font-size:12px;">${salesName(c.salesId)}</td>` : ''}
+              <td onclick="event.stopPropagation()">
+                <div style="display:flex;gap:4px;">
+                  ${isAdm ? `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditCustomer('${c.id}')">Edit</button>` : ''}
+                  <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openDetail('${c.id}')">View</button>
+                </div>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    ${!isAdm ? `<div style="margin-top:16px; padding:12px 16px; background:var(--info-bg); border-radius:var(--radius); font-size:12px; color:var(--info);">
+      <strong>ℹ</strong> ${t('readOnly')}
+    </div>` : ''}
+  `;
+}
+
+/* ============================================================
+   FOLLOW-UP PAGE
+   ============================================================ */
+function renderFollowUp() {
+  const list = visibleCustomers().filter(c => c.status === 'following' || c.status === 'new');
+  el('page-content').innerHTML = `
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-h1">${t('followUp')}</div>
+        <div class="page-desc">${list.length} customers need attention</div>
+      </div>
+    </div>
+    ${list.length === 0 ? `<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <div class="empty-title">All caught up!</div>
+      <div class="empty-desc">No pending follow-ups</div>
+    </div>` : ''}
+    ${list.map(c => `<div class="card" style="margin-bottom:12px;cursor:pointer;" onclick="openDetail('${c.id}')">
+      <div style="display:flex;align-items:flex-start;gap:14px;">
+        <div class="cust-avatar" style="background:${avatarColor(c.company)};width:40px;height:40px;font-size:13px;">${initials(c.company)}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+            <span style="font-weight:600;font-size:14px;">${c.company}</span>
+            ${statusBadge(c.status)}
+          </div>
+          <div style="font-size:12px;color:var(--muted);">${c.country} · ${c.contact} · ${c.email}</div>
+          <div style="font-size:12px;color:var(--mid);margin-top:6px;padding:8px;background:var(--cream);border-radius:var(--radius-sm);">
+            ${c.timeline.length > 0 ? `<strong>Last activity:</strong> ${c.timeline[0].date} — ${c.timeline[0].text}` : 'No recent activity'}
+          </div>
+        </div>
+        ${isAdmin() ? `<div style="font-size:11px;color:var(--muted);text-align:right;white-space:nowrap;">${salesName(c.salesId)}</div>` : ''}
+      </div>
+    </div>`).join('')}
+  `;
+}
+
+/* ============================================================
+   DETAIL PANEL
+   ============================================================ */
+function openDetail(id) {
+  const c = STATE.customers.find(x => x.id === id);
+  if (!c) return;
+  el('detail-company').textContent = c.company;
+  el('detail-meta').textContent = `${c.type} · ${c.country}`;
+  el('detail-body').innerHTML = `
+    <div class="detail-section">
+      <div class="detail-section-title">${t('basicInfo')}</div>
+      <div class="detail-field"><div class="detail-field-label">${t('contact')}</div><div class="detail-field-val" style="font-weight:500;">${c.contact}</div></div>
+      <div class="detail-field"><div class="detail-field-label">${t('email')}</div><div class="detail-field-val"><a href="mailto:${c.email}" style="color:var(--warm-orange);text-decoration:none;">${c.email}</a></div></div>
+      <div class="detail-field"><div class="detail-field-label">${t('phone')}</div><div class="detail-field-val">${c.phone||'—'}</div></div>
+      ${c.wechat ? `<div class="detail-field"><div class="detail-field-label">${t('wechat')}</div><div class="detail-field-val">${c.wechat}</div></div>` : ''}
+      <div class="detail-field"><div class="detail-field-label">${t('product')}</div><div class="detail-field-val">${c.product}</div></div>
+      <div class="detail-field"><div class="detail-field-label">${t('status')}</div><div class="detail-field-val">${statusBadge(c.status)}</div></div>
+      ${isAdmin() ? `<div class="detail-field"><div class="detail-field-label">${t('assignedTo')}</div><div class="detail-field-val">${salesName(c.salesId)}</div></div>` : ''}
+      ${c.note ? `<div class="detail-field"><div class="detail-field-label">${t('note')}</div><div class="detail-field-val" style="font-size:12px;color:var(--mid);">${c.note}</div></div>` : ''}
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>${t('timeline')}</span>
+        ${canAddFollowUp(c) ? `<button class="btn btn-primary btn-sm" onclick="openAddFollowUp('${c.id}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          ${t('addFollowUp')}</button>` : ''}
+      </div>
+      <div class="timeline">
+        ${c.timeline.length === 0 ? `<div style="font-size:12px;color:var(--muted);padding:8px 0;">${t('noFollowUp')}</div>` : ''}
+        ${c.timeline.map(tl => `<div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <div class="timeline-date">${tl.date}${tl.authorName ? ` · ${t('by')} ${tl.authorName}` : ''}</div>
+              ${canManageFollowUp() ? `<button class="btn-icon" style="width:20px;height:20px;" title="${t('deleteCustomer')}" onclick="confirmDeleteFollowUp('${c.id}','${tl.id}')">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>` : ''}
+            </div>
+            <div class="timeline-text">${tl.text}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+      ${canAddFollowUp(c) && !isAdmin() ? `<div style="margin-top:10px; padding:10px 12px; background:var(--info-bg); border-radius:var(--radius-sm); font-size:11px; color:var(--info);">${t('followUpNoteOnly')}</div>` : ''}
+    </div>
+  `;
+  el('detail-footer').innerHTML = `
+    ${isAdmin() ? `<button class="btn btn-primary btn-sm" onclick="closeDetail();openEditCustomer('${c.id}')">Edit</button>` : ''}
+    ${isAdmin() ? `<button class="btn btn-danger-outline btn-sm" onclick="closeDetail();confirmDeleteCustomer('${c.id}')">Delete</button>` : ''}
+    <button class="btn btn-secondary btn-sm" onclick="closeDetail()">Close</button>
+  `;
+  el('detail-panel').classList.add('open');
+  el('detail-overlay').classList.add('visible');
+}
+function closeDetail() {
+  el('detail-panel').classList.remove('open');
+  el('detail-overlay').classList.remove('visible');
+}
+
+/* ============================================================
+   FOLLOW-UP RECORDS (per customer)
+   ============================================================ */
+function openAddFollowUp(customerId) {
+  const c = STATE.customers.find(x => x.id === customerId);
+  if (!c || !canAddFollowUp(c)) { showToast(t('readOnly'), 'danger'); return; }
+  const today = new Date().toISOString().slice(0,10);
+  el('modal-title').textContent = t('addFollowUp');
+  el('modal-body').innerHTML = `
+    <div class="form-group"><label class="form-label">${t('followUpDate')}</label>
+      <input class="form-input" type="date" id="fu-date" value="${today}"></div>
+    <div class="form-group"><label class="form-label">${t('followUpText')}</label>
+      <textarea class="form-textarea" id="fu-text" placeholder="${t('writeFollowUpPlaceholder')}"></textarea></div>
+  `;
+  el('modal-footer').innerHTML = `
+    <button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button>
+    <button class="btn btn-primary" onclick="saveNewFollowUp('${customerId}')">${t('save')}</button>`;
+  openModal();
+}
+function saveNewFollowUp(customerId) {
+  const c = STATE.customers.find(x => x.id === customerId);
+  if (!c || !canAddFollowUp(c)) { showToast(t('readOnly'), 'danger'); return; }
+  const date = el('fu-date').value;
+  const text = el('fu-text').value.trim();
+  if (!date || !text) { showToast('Please fill in date and note', 'danger'); return; }
+  c.timeline.unshift({
+    id: genId('tl'),
+    date,
+    text,
+    authorId: STATE.currentUser.id,
+    authorName: STATE.currentUser.name,
+    createdAt: new Date().toISOString()
+  });
+  c.timeline.sort((a,b) => (b.createdAt||b.date).localeCompare(a.createdAt||a.date));
+  saveCRM();
+  closeModal();
+  openDetail(customerId);
+  if (STATE.currentPage === 'followup') renderFollowUp();
+  showToast(t('followUpAdded'), 'success');
+}
+function confirmDeleteFollowUp(customerId, followUpId) {
+  if (!canManageFollowUp()) { showToast(t('contactAdminDelete'), 'danger'); return; }
+  el('modal-title').textContent = t('deleteCustomer');
+  el('modal-body').innerHTML = `<p style="color:var(--mid);">${t('confirmDeleteFollowUp')}</p>`;
+  el('modal-footer').innerHTML = `
+    <button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button>
+    <button class="btn btn-danger-outline" onclick="deleteFollowUp('${customerId}','${followUpId}')">${t('deleteCustomer')}</button>`;
+  openModal();
+}
+function deleteFollowUp(customerId, followUpId) {
+  if (!canManageFollowUp()) { showToast(t('contactAdminDelete'), 'danger'); return; }
+  const c = STATE.customers.find(x => x.id === customerId);
+  if (!c) return;
+  c.timeline = c.timeline.filter(tl => tl.id !== followUpId);
+  saveCRM();
+  closeModal();
+  openDetail(customerId);
+  if (STATE.currentPage === 'followup') renderFollowUp();
+  showToast(t('followUpDeleted'));
+}
+
+/* ============================================================
+   CUSTOMER FORM
+   ============================================================ */
+function salesOptions(currentId) {
+  return STATE.accounts.filter(a => a.role === 'sales' && a.status === 'active')
+    .map(a => `<option value="${a.id}" ${a.id === currentId ? 'selected' : ''}>${a.name}</option>`).join('');
+}
+
+function openAddCustomer() {
+  el('modal-title').textContent = t('addCustomer');
+  el('modal-body').innerHTML = customerForm({});
+  el('modal-footer').innerHTML = `
+    <button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button>
+    <button class="btn btn-primary" onclick="saveNewCustomer()">${t('save')}</button>`;
+  openModal();
+}
+
+function openEditCustomer(id) {
+  if (!isAdmin()) { showToast(t('readOnly'), 'danger'); return; }
+  const c = STATE.customers.find(x => x.id === id);
+  if (!c) return;
+  el('modal-title').textContent = t('editCustomer');
+  el('modal-body').innerHTML = customerForm(c);
+  el('modal-footer').innerHTML = `
+    <button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button>
+    <button class="btn btn-primary" onclick="saveEditCustomer('${id}')">${t('save')}</button>`;
+  openModal();
+}
+
+function customerForm(c) {
+  const statusOpts = ['new','following','closed','lost'].map(s =>
+    `<option value="${s}" ${c.status===s?'selected':''}>${t('status_'+s)}</option>`).join('');
+  const typeOpts = ['Brand','Importer','Retailer','Manufacturer','Distributor'].map(tp =>
+    `<option value="${tp}" ${c.type===tp?'selected':''}>${t(tp.toLowerCase())||tp}</option>`).join('');
+  return `
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">${t('company')} *</label>
+        <input class="form-input" id="f-company" value="${c.company||''}" placeholder="Company name"></div>
+      <div class="form-group"><label class="form-label">${t('country')} *</label>
+        <input class="form-input" id="f-country" value="${c.country||''}" placeholder="e.g. Germany"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">${t('type')}</label>
+        <select class="form-select" id="f-type"><option value="">${t('allTypes')}</option>${typeOpts}</select></div>
+      <div class="form-group"><label class="form-label">${t('status')}</label>
+        <select class="form-select" id="f-status">${statusOpts}</select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">${t('contact')}</label>
+        <input class="form-input" id="f-contact" value="${c.contact||''}" placeholder="Contact name"></div>
+      <div class="form-group"><label class="form-label">${t('email')}</label>
+        <input class="form-input" id="f-email" type="email" value="${c.email||''}" placeholder="email@example.com"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">${t('phone')}</label>
+        <input class="form-input" id="f-phone" value="${c.phone||''}" placeholder="+1-xxx-xxx-xxxx"></div>
+      <div class="form-group"><label class="form-label">${t('wechat')}</label>
+        <input class="form-input" id="f-wechat" value="${c.wechat||''}" placeholder="WeChat ID or WhatsApp"></div>
+    </div>
+    <div class="form-group"><label class="form-label">${t('product')}</label>
+      <input class="form-input" id="f-product" value="${c.product||''}" placeholder="e.g. Down jacket fabric, 40D ripstop nylon"></div>
+    <div class="form-group"><label class="form-label">${t('assignTo')}</label>
+      ${isAdmin()
+        ? `<select class="form-select" id="f-sales">${salesOptions(c.salesId||STATE.currentUser.id)}</select>`
+        : `<input class="form-input" value="${STATE.currentUser.name}" disabled style="background:var(--pale);color:var(--mid);">
+           <input type="hidden" id="f-sales" value="${STATE.currentUser.id}">`}
+    </div>
+    <div class="form-group"><label class="form-label">${t('note')}</label>
+      <textarea class="form-textarea" id="f-note" placeholder="Additional notes...">${c.note||''}</textarea></div>
+  `;
+}
+
+function getFormData() {
+  return {
+    company: el('f-company').value.trim(),
+    country: el('f-country').value.trim(),
+    type: el('f-type').value,
+    status: el('f-status').value,
+    contact: el('f-contact').value.trim(),
+    email: el('f-email').value.trim(),
+    phone: el('f-phone').value.trim(),
+    wechat: el('f-wechat').value.trim(),
+    product: el('f-product').value.trim(),
+    salesId: el('f-sales').value,
+    note: el('f-note').value.trim()
+  };
+}
+
+function saveNewCustomer() {
+  const d = getFormData();
+  if (!d.company || !d.country) { showToast('Company and Country are required', 'danger'); return; }
+  if (!isAdmin()) d.salesId = STATE.currentUser.id; // sales can only ever assign to themselves
+  const newId = 'c' + Date.now();
+  STATE.customers.unshift({ id: newId, ...d, createdAt: new Date().toISOString().slice(0,10), timeline: [] });
+  saveCRM();
+  closeModal();
+  renderCustomers();
+  showToast(t('customerAdded'), 'success');
+}
+
+function saveEditCustomer(id) {
+  if (!isAdmin()) { showToast(t('readOnly'), 'danger'); return; }
+  const d = getFormData();
+  if (!d.company || !d.country) { showToast('Company and Country are required', 'danger'); return; }
+  const idx = STATE.customers.findIndex(x => x.id === id);
+  if (idx >= 0) STATE.customers[idx] = { ...STATE.customers[idx], ...d };
+  saveCRM();
+  closeModal();
+  renderCustomers();
+  showToast(t('customerSaved'), 'success');
+}
+
+function csvEscape(v) {
+  const s = (v === undefined || v === null) ? '' : String(v);
+  if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+function exportCustomersCSV() {
+  if (!isSuperAdmin()) { showToast('Only the super admin can export data', 'danger'); return; }
+  const headers = ['Company','Country','Type','Contact','Email','Phone','WeChat/WhatsApp','Status','Product Interest','Assigned To','Notes','Created At','Follow-Up Count','Latest Follow-Up'];
+  const rows = STATE.customers.map(c => {
+    const latest = (c.timeline && c.timeline[0]) ? `${c.timeline[0].date} - ${c.timeline[0].text}` : '';
+    return [c.company, c.country, c.type, c.contact, c.email, c.phone, c.wechat, t('status_'+c.status)||c.status, c.product, salesName(c.salesId), c.note, c.createdAt, (c.timeline||[]).length, latest];
+  });
+  let csv = '\uFEFF' + headers.map(csvEscape).join(',') + '\r\n';
+  rows.forEach(r => { csv += r.map(csvEscape).join(',') + '\r\n'; });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${STATE.settings.companyName.replace(/\s+/g,'_')}_customers_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast(t('exportCustomers') + ' ✓', 'success');
+}
+function confirmDeleteCustomer(id) {
+  if (!isAdmin()) { showToast(t('readOnly'), 'danger'); return; }
+  const c = STATE.customers.find(x => x.id === id);
+  el('modal-title').textContent = t('deleteCustomer');
+  el('modal-body').innerHTML = `<p style="color:var(--mid);">${t('confirmDelete')}<br><strong>${c.company}</strong></p>`;
+  el('modal-footer').innerHTML = `
+    <button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button>
+    <button class="btn btn-danger-outline" onclick="deleteCustomer('${id}')">${t('deleteCustomer')}</button>`;
+  openModal();
+}
+function deleteCustomer(id) {
+  if (!isAdmin()) { showToast(t('readOnly'), 'danger'); return; }
+  STATE.customers = STATE.customers.filter(x => x.id !== id);
+  saveCRM();
+  closeModal();
+  renderCustomers();
+  showToast(t('customerDeleted'));
+}
+
+/* ============================================================
+   ACCOUNTS PAGE
+   ============================================================ */
+function renderAccounts() {
+  el('page-content').innerHTML = `
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-h1">${t('accountMgmt')}</div>
+        <div class="page-desc">${STATE.accounts.length} accounts total</div>
+      </div>
+      ${isSuperAdmin() ? `<button class="btn btn-primary" onclick="openAddAccount()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        ${t('addAccount')}</button>` : ''}
+    </div>
+    <div>
+      ${STATE.accounts.map(acc => `
+        <div class="account-row" style="${acc.status==='active'?'':'opacity:0.55;'}">
+          <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0;">${accountAvatarHTML(acc, 30)}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:500;font-size:13px;">${acc.name} <span style="font-weight:400;color:var(--muted);">@${acc.username}</span></div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">${t('status')}: <span style="color:${acc.status==='active'?'var(--success)':'var(--danger)'}">${acc.status==='active'?t('accActive'):t('accDisabled')}</span></div>
+          </div>
+          ${roleBadge(acc.role)}
+          <div class="account-actions">
+            ${isSuperAdmin() && acc.role !== 'superadmin' ? `
+              <button class="btn btn-secondary btn-sm" onclick="openEditAccount('${acc.id}')">Edit</button>
+              <button class="btn btn-secondary btn-sm" onclick="toggleAccountStatus('${acc.id}')">${acc.status==='active'?t('accDisabled'):t('accActive')}</button>
+              <button class="btn btn-danger-outline btn-sm" onclick="deleteAccount('${acc.id}')">Del</button>
+            ` : acc.role === 'superadmin' ? `<span class="badge badge-super">Protected</span>` : ''}
+            ${!isSuperAdmin() && isAdmin() && acc.role === 'sales' ? `<button class="btn btn-secondary btn-sm" onclick="openEditAccount('${acc.id}')">Edit</button>` : ''}
+          </div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+function openAddAccount() {
+  el('modal-title').textContent = t('addAccount');
+  el('modal-body').innerHTML = accountForm({});
+  el('modal-footer').innerHTML = `<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveNewAccount()">${t('save')}</button>`;
+  openModal();
+}
+function openEditAccount(id) {
+  const acc = STATE.accounts.find(a => a.id === id);
+  if (!acc) return;
+  el('modal-title').textContent = t('editAccount');
+  el('modal-body').innerHTML = accountForm(acc);
+  el('modal-footer').innerHTML = `<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveEditAccount('${id}')">${t('save')}</button>`;
+  openModal();
+}
+function accountForm(acc) {
+  return `
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">${t('accUsername')} *</label>
+        <input class="form-input" id="fa-username" value="${acc.username||''}" placeholder="username"></div>
+      <div class="form-group"><label class="form-label">${t('accName')} *</label>
+        <input class="form-input" id="fa-name" value="${acc.name||''}" placeholder="Full name"></div>
+    </div>
+    <div class="form-group"><label class="form-label">${t('newPassword')} ${acc.username ? '(leave blank to keep)' : '*'}</label>
+      <input class="form-input" id="fa-password" type="password" placeholder="Password" ${!acc.username?'required':''}></div>
+    <div class="form-group"><label class="form-label">${t('accRole')}</label>
+      <select class="form-select" id="fa-role">
+        <option value="sales" ${acc.role==='sales'?'selected':''}>${t('sales')}</option>
+        ${isSuperAdmin() ? `<option value="admin" ${acc.role==='admin'?'selected':''}>${t('admin')}</option>` : ''}
+      </select></div>
+  `;
+}
+function saveNewAccount() {
+  const u = el('fa-username').value.trim(), n = el('fa-name').value.trim(), p = el('fa-password').value;
+  if (!u || !n || !p) { showToast('All fields required', 'danger'); return; }
+  if (STATE.accounts.find(a => a.username === u)) { showToast('Username already exists', 'danger'); return; }
+  STATE.accounts.push({ id: 'u' + Date.now(), username: u, password: p, role: el('fa-role').value, name: n, status: 'active', createdAt: new Date().toISOString().slice(0,10) });
+  saveCRM();
+  closeModal(); renderAccounts(); showToast(t('accountAdded'), 'success');
+}
+function saveEditAccount(id) {
+  const acc = STATE.accounts.find(a => a.id === id);
+  if (!acc) return;
+  const u = el('fa-username').value.trim(), n = el('fa-name').value.trim(), p = el('fa-password').value;
+  if (!u || !n) { showToast('Username and name required', 'danger'); return; }
+  if (STATE.accounts.find(a => a.username === u && a.id !== id)) { showToast('Username taken', 'danger'); return; }
+  acc.username = u; acc.name = n; acc.role = el('fa-role').value;
+  if (p) acc.password = p;
+  saveCRM();
+  closeModal(); renderAccounts(); showToast(t('accountSaved'), 'success');
+}
+function toggleAccountStatus(id) {
+  const acc = STATE.accounts.find(a => a.id === id);
+  if (acc) { acc.status = acc.status === 'active' ? 'disabled' : 'active'; saveCRM(); renderAccounts(); }
+}
+function deleteAccount(id) {
+  STATE.accounts = STATE.accounts.filter(a => a.id !== id);
+  saveCRM();
+  renderAccounts(); showToast('Account removed');
+}
+
+/* ============================================================
+   SETTINGS PAGE
+   ============================================================ */
+function renderSettings() {
+  const s = STATE.settings;
+  el('page-content').innerHTML = `
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-h1">${t('settingsTitle')}</div>
+        <div class="page-desc">${t('superAdmin')} only</div>
+      </div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warm-orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/></svg>
+        <div class="settings-card-title">${t('branding')}</div>
+      </div>
+      <div class="settings-card-body">
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">${t('companyLogo')}</label>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div id="settings-logo-preview" style="width:56px;height:56px;border-radius:var(--radius);overflow:hidden;background:var(--warm-orange);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:#fff;flex-shrink:0;">${s.logo ? `<img src="${s.logo}" style="width:100%;height:100%;object-fit:cover;">` : 'B'}</div>
+            <div style="display:flex;gap:8px;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="el('logo-file-input').click()">${t('uploadLogo')}</button>
+              ${s.logo ? `<button type="button" class="btn btn-danger-outline btn-sm" onclick="removeLogo()">${t('removeLogo')}</button>` : ''}
+            </div>
+            <input type="file" id="logo-file-input" accept="image/*" style="display:none" onchange="handleLogoFile(this)">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">${t('companyNameLabel')}</label>
+            <input class="form-input" id="s-name" value="${s.companyName}"></div>
+          <div class="form-group"><label class="form-label">${t('taglineLabel')}</label>
+            <input class="form-input" id="s-sub" value="${s.companySub}"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Login Tagline</label>
+          <input class="form-input" id="s-tagline" value="${s.tagline}"></div>
+      </div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warm-orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+        <div class="settings-card-title">${t('headerFooter')}</div>
+      </div>
+      <div class="settings-card-body">
+        <div class="form-group" style="margin-bottom:14px;"><label class="form-label">${t('headerTextLabel')}</label>
+          <input class="form-input" id="s-header" value="${s.headerText}"></div>
+        <div class="form-group"><label class="form-label">${t('footerTextLabel')}</label>
+          <input class="form-input" id="s-footer" value="${s.footerText}"></div>
+      </div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-card-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warm-orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <div class="settings-card-title">${t('policies')}</div>
+      </div>
+      <div class="settings-card-body">
+        <div class="form-group" style="margin-bottom:14px;"><label class="form-label">${t('privacyPolicyContent')}</label>
+          <textarea class="form-textarea" id="s-privacy" style="min-height:120px;font-size:12px;">${s.privacyPolicy}</textarea></div>
+        <div class="form-group"><label class="form-label">${t('securityPolicyContent')}</label>
+          <textarea class="form-textarea" id="s-security" style="min-height:120px;font-size:12px;">${s.securityPolicy}</textarea></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+      <button class="btn btn-primary" onclick="saveSettings()">${t('saveSettings')}</button>
+    </div>
+  `;
+}
+
+function saveSettings() {
+  STATE.settings.companyName = el('s-name').value;
+  STATE.settings.companySub = el('s-sub').value;
+  STATE.settings.tagline = el('s-tagline').value;
+  STATE.settings.headerText = el('s-header').value;
+  STATE.settings.footerText = el('s-footer').value;
+  STATE.settings.privacyPolicy = el('s-privacy').value;
+  STATE.settings.securityPolicy = el('s-security').value;
+  saveCRM();
+  // Update login page
+  el('login-company-name').textContent = STATE.settings.companyName;
+  el('login-company-sub').textContent = STATE.settings.companySub;
+  el('login-tagline').textContent = STATE.settings.tagline;
+  const brandName = document.querySelector('.sidebar-brand-name');
+  const brandSub = document.querySelector('.sidebar-brand-sub');
+  if (brandName) brandName.textContent = STATE.settings.companyName;
+  if (brandSub) brandSub.textContent = STATE.settings.companySub;
+  showToast(t('settingsSaved'), 'success');
+}
+function handleLogoFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { showToast('Please select an image file', 'danger'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const size = 160;
+      const canvas = document.createElement('canvas');
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const scale = Math.max(size / img.width, size / img.height);
+      const w = img.width * scale, h = img.height * scale;
+      ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+      STATE.settings.logo = canvas.toDataURL('image/png');
+      saveCRM();
+      renderLogo();
+      renderSettings();
+      showToast(t('logoUpdated'), 'success');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+function removeLogo() {
+  STATE.settings.logo = null;
+  saveCRM();
+  renderLogo();
+  renderSettings();
+  showToast(t('logoUpdated'));
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+function openModal() {
+  el('modal-overlay').classList.add('open');
+}
+function closeModal() {
+  el('modal-overlay').classList.remove('open');
+}
+el('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+/* ============================================================
+   POLICY MODAL
+   ============================================================ */
+function showPolicy(type) {
+  el('modal-title').textContent = type === 'privacy' ? t('privacy') : t('security');
+  el('modal-body').innerHTML = `<div class="policy-content">${type === 'privacy' ? STATE.settings.privacyPolicy : STATE.settings.securityPolicy}</div>`;
+  el('modal-footer').innerHTML = `<button class="btn btn-secondary" onclick="closeModal()">${t('close')}</button>`;
+  openModal();
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function initApp() {
+  saveCRM();
+  renderLogo();
+  renderSidebarAvatar();
+  el('sidebar-username').textContent = STATE.currentUser.name;
+  el('sidebar-role').textContent = t(STATE.currentUser.role === 'superadmin' ? 'superAdmin' : STATE.currentUser.role === 'admin' ? 'admin' : 'sales');
+  STATE.currentPage = 'dashboard';
+  renderSidebar();
+  renderDashboard();
+  el('topbar-title').textContent = t('nav_dashboard');
+  el('lbl-logout').textContent = t('signOut');
+  // Update lang toggles
+  document.querySelectorAll('.topbar-lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === (STATE.lang === 'zh' ? '中文' : 'EN'));
+  });
+}
+
+loadCRM();
+normalizeData();
+el('login-company-name').textContent = STATE.settings.companyName;
+el('login-company-sub').textContent = STATE.settings.companySub;
+el('login-tagline').textContent = STATE.settings.tagline;
+renderLogo();
+setLang(STATE.lang);
+
+// Enter key on login
+el('login-username').addEventListener('keydown', e => { if (e.key === 'Enter') el('login-password').focus(); });
+</script>
+</body>
+</html>
