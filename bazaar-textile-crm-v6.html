@@ -476,16 +476,28 @@ const DB = {
 /* ================================================================
    SUPABASE CONFIG & REST CLIENT
    ================================================================ */
-let SUPA = { url: '', anonKey: '', configured: false };
+// Built-in default Supabase project — the CRM auto-connects to this database
+// on load so every user (admin or sales) shares the same live, synced data.
+const DEFAULT_SUPA = {
+  url: 'https://bqrirktdgltmfuriyaof.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxcmlya3RkZ2x0bWZ1cml5YW9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2MDM0NTcsImV4cCI6MjEwMDE3OTQ1N30.snsS8Sjit-3HCkLqRRInhXeZxFhsQNCf1eBm7OgAM9o'
+};
+let SUPA = { ...DEFAULT_SUPA, configured: true };
 let realtimeSocket = null;
 let realtimeChannels = {};
 let autoRefreshTimer = null;
 
 function loadSupaConfig() {
+  // Prefer a manually-saved override (set via the Sync Settings modal), if any.
   try {
     const raw = localStorage.getItem('bt_supa_config');
-    if (raw) { const c = JSON.parse(raw); if (c.url && c.anonKey) { SUPA = { ...c, configured: true }; } }
+    if (raw) {
+      const c = JSON.parse(raw);
+      if (c.url && c.anonKey) { SUPA = { ...c, configured: true }; return; }
+    }
   } catch(e) {}
+  // Otherwise fall back to the built-in project so the app is connected out of the box.
+  SUPA = { ...DEFAULT_SUPA, configured: true };
 }
 function saveSupaConfig(cfg) {
   SUPA = { url: cfg.url.replace(/\/$/, ''), anonKey: cfg.anonKey, configured: true };
@@ -1352,7 +1364,7 @@ function renderDetailPanel(id, tab) {
     const contacts = custContacts(id);
     body = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <span class="detail-section-title" style="margin:0;padding:0;border:none;">${t('contactsTab')}</span>
-        ${isAdmin()?`<button class="btn btn-primary btn-sm" onclick="openAddContact('${id}')">+ Add</button>`:''}
+        <button class="btn btn-primary btn-sm" onclick="openAddContact('${id}')">+ Add</button>
       </div>
       ${contacts.length===0?'<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No contacts yet</div>':''}
       ${contacts.map(ct=>`<div class="account-row" style="margin-bottom:8px;">
@@ -1387,7 +1399,7 @@ function renderDetailPanel(id, tab) {
     const quots = custQuotations(id);
     body = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <span class="detail-section-title" style="margin:0;padding:0;border:none;">${t('quotationsTab')}</span>
-        ${isAdmin()?`<button class="btn btn-primary btn-sm" onclick="openAddQuotation('${id}')">+ ${t('addQuotation')}</button>`:''}
+        <button class="btn btn-primary btn-sm" onclick="openAddQuotation('${id}')">+ ${t('addQuotation')}</button>
       </div>
       ${quots.length===0?'<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No quotations yet</div>':''}
       ${quots.map(q=>`<div class="account-row" style="margin-bottom:8px;">
@@ -1546,6 +1558,7 @@ async function saveContact(custId) {
   closeModal();renderDetailPanel(custId,'contacts');showToast('Contact added','success');
 }
 async function deleteContact(id,custId) {
+  if(!isAdmin()){showToast('Admin only','danger');return;}
   if(SUPA.configured)try{await sbDelete('contacts',id);}catch(e){showToast('Delete failed','danger');return;}
   DB.contacts=DB.contacts.filter(x=>x.id!==id);
   renderDetailPanel(custId,'contacts');showToast('Deleted');
