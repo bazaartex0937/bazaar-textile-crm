@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bazaar Textile CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<style>
+/* ============ DESIGN TOKENS ============ */
+:root{
+  --black:#111110;--dark:#1C1B19;--charcoal:#2E2D2A;--mid:#5C5A54;
+  --muted:#9C9A93;--light:#D4D1C8;--pale:#EEECE6;--cream:#F7F5F0;--white:#FFFFFF;
+  --warm-orange:#C8864A;--warm-orange-h:#B5733A;--warm-gold:#D4A55A;
+  --warm-sand:#E8D5B0;--warm-linen:#F2E8D8;--warm-deep:#7A4E2A;
+  --success:#3D8A5E;--success-bg:#EBF5F0;
+  --warning:#A0712A;--warning-bg:#FBF3E3;
+  --danger:#B8392A;--danger-bg:#FAEDEB;
+  --info:#2A6A9A;--info-bg:#E8F2FA;
+  --r-sm:4px;--r:8px;--r-lg:12px;--r-xl:16px;
+  --sh-sm:0 1px 3px rgba(17,17,16,.08);
+  --sh:0 2px 8px rgba(17,17,16,.10);
+  --sh-lg:0 8px 32px rgba(17,17,16,.14);
+  --sw:220px;--sw-c:60px;--tbh:56px;--tr:.22s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',-apple-system,sans-serif;font-size:14px;color:var(--dark);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--light);border-radius:2px;}
+
+/* ============ UTILS ============ */
+.hidden{display:none!important;}
+.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ============ BADGE ============ */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap;}
+.badge-success{background:var(--success-bg);color:var(--success);}
+.badge-warning{background:var(--warning-bg);color:var(--warning);}
+.badge-danger{background:var(--danger-bg);color:var(--danger);}
+.badge-info{background:var(--info-bg);color:var(--info);}
+.badge-neutral{background:var(--pale);color:var(--mid);}
+.badge-admin{background:#2E2D2A;color:#E8D5B0;}
+.badge-super{background:#7A4E2A;color:#F2E8D8;}
+
+/* ============ BUTTON ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border-radius:var(--r);border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;transition:all var(--tr);text-decoration:none;white-space:nowrap;}
+.btn-primary{background:var(--warm-orange);color:var(--white);}
+.btn-primary:hover{background:var(--warm-orange-h);}
+.btn-secondary{background:var(--white);color:var(--dark);border:1px solid var(--light);}
+.btn-secondary:hover{background:var(--cream);border-color:var(--muted);}
+.btn-ghost{background:transparent;color:var(--mid);}
+.btn-ghost:hover{background:var(--pale);color:var(--dark);}
+.btn-danger-outline{background:transparent;color:var(--danger);border:1px solid var(--danger);}
+.btn-danger-outline:hover{background:var(--danger-bg);}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.btn-icon{padding:7px;border-radius:var(--r);background:transparent;border:none;cursor:pointer;color:var(--mid);display:inline-flex;align-items:center;justify-content:center;transition:all var(--tr);}
+.btn-icon:hover{background:var(--pale);color:var(--dark);}
+.btn-icon svg{width:16px;height:16px;}
+.btn:disabled,.btn[disabled]{opacity:.5;cursor:not-allowed;}
+
+/* ============ FORM ============ */
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:12px;font-weight:500;color:var(--charcoal);}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;border:1px solid var(--light);border-radius:var(--r);background:var(--white);color:var(--dark);font-family:inherit;font-size:13px;transition:border-color var(--tr),box-shadow var(--tr);outline:none;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--warm-orange);box-shadow:0 0 0 3px rgba(200,134,74,.12);}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:600px){.form-row{grid-template-columns:1fr;}}
+
+/* ============ CARD ============ */
+.card{background:var(--white);border-radius:var(--r-lg);border:1px solid var(--pale);padding:20px;box-shadow:var(--sh-sm);}
+.card-title{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+/* ============ TABLE ============ */
+.table-wrap{overflow-x:auto;}
+.table{width:100%;border-collapse:collapse;}
+.table th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--pale);text-align:left;white-space:nowrap;background:var(--cream);}
+.table td{padding:12px 14px;border-bottom:1px solid var(--pale);font-size:13px;color:var(--dark);vertical-align:middle;}
+.table tr:last-child td{border-bottom:none;}
+.table tbody tr{transition:background var(--tr);cursor:pointer;}
+.table tbody tr:hover{background:var(--cream);}
+
+/* ============ STAT GRID ============ */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+@media(max-width:900px){.stat-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.stat-grid{grid-template-columns:1fr 1fr;gap:10px;}}
+.stat-card{background:var(--white);border-radius:var(--r-lg);border:1px solid var(--pale);padding:18px 20px;box-shadow:var(--sh-sm);position:relative;overflow:hidden;}
+.stat-card::after{content:'';position:absolute;bottom:0;left:0;width:40px;height:3px;border-radius:0 2px 0 0;background:var(--warm-orange);}
+.stat-num{font-size:28px;font-weight:600;color:var(--black);font-feature-settings:"tnum";line-height:1.1;}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:4px;}
+.stat-sub{font-size:11px;color:var(--success);margin-top:6px;}
+
+/* ============ LOGIN ============ */
+#page-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--black);position:relative;overflow:hidden;}
+.login-bg-texture{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(200,134,74,.04) 60px,rgba(200,134,74,.04) 61px),repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(200,134,74,.04) 60px,rgba(200,134,74,.04) 61px);}
+.login-side{position:absolute;right:0;top:0;bottom:0;width:42%;background:var(--warm-deep);opacity:.15;clip-path:polygon(15% 0,100% 0,100% 100%,0% 100%);}
+.login-box{position:relative;z-index:10;width:100%;max-width:400px;margin:20px;background:var(--dark);border-radius:var(--r-xl);border:1px solid var(--charcoal);box-shadow:var(--sh-lg);overflow:hidden;}
+.login-header{padding:32px 32px 24px;border-bottom:1px solid var(--charcoal);}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.login-logo-mark{width:42px;height:42px;border-radius:var(--r);overflow:hidden;background:var(--warm-orange);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--white);flex-shrink:0;}
+.login-logo-mark img,.sidebar-logo-mark img{width:100%;height:100%;object-fit:cover;}
+.login-logo-name{font-size:16px;font-weight:600;color:var(--white);letter-spacing:.02em;}
+.login-logo-sub{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
+.login-headline{font-size:12px;color:#5C5A54;line-height:1.5;}
+.login-form-area{padding:24px 32px 28px;}
+.login-form-group{margin-bottom:16px;}
+.login-label{font-size:11px;font-weight:500;color:var(--muted);margin-bottom:6px;display:block;letter-spacing:.04em;text-transform:uppercase;}
+.login-input{width:100%;padding:11px 14px;background:var(--charcoal);border:1px solid #3D3C38;border-radius:var(--r);color:var(--white);font-family:inherit;font-size:14px;outline:none;transition:border-color var(--tr);}
+.login-input::placeholder{color:var(--mid);}
+.login-input:focus{border-color:var(--warm-orange);}
+.login-btn{width:100%;padding:12px;border:none;border-radius:var(--r);background:var(--warm-orange);color:var(--white);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background var(--tr);margin-top:8px;}
+.login-btn:hover:not(:disabled){background:var(--warm-orange-h);}
+.login-btn:disabled{opacity:.6;cursor:not-allowed;}
+.login-error{color:#F08070;font-size:12px;margin-top:10px;display:none;text-align:center;}
+.login-footer{display:flex;justify-content:space-between;align-items:center;padding:14px 32px;border-top:1px solid var(--charcoal);}
+.lang-toggle{display:flex;gap:2px;background:var(--charcoal);border-radius:var(--r-sm);padding:2px;}
+.lang-btn{padding:3px 10px;border-radius:3px;font-size:11px;font-weight:500;cursor:pointer;transition:all var(--tr);color:var(--muted);border:none;background:transparent;font-family:inherit;}
+.lang-btn.active{background:var(--dark);color:var(--white);}
+.login-policies{display:flex;gap:12px;}
+.policy-link{font-size:11px;color:var(--mid);cursor:pointer;text-decoration:none;transition:color var(--tr);}
+.policy-link:hover{color:var(--warm-gold);}
+
+/* ============ APP SHELL ============ */
+#app-shell{display:none;min-height:100vh;}
+#app-shell.visible{display:flex;}
+
+/* ============ SIDEBAR ============ */
+.sidebar{width:var(--sw);background:var(--black);flex-shrink:0;display:flex;flex-direction:column;transition:width var(--tr),transform var(--tr);position:fixed;left:0;top:0;bottom:0;z-index:100;overflow:hidden;}
+.sidebar.collapsed{width:var(--sw-c);}
+.sidebar-brand{padding:18px 16px 14px;border-bottom:1px solid var(--charcoal);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.sidebar-logo-mark{width:30px;height:30px;border-radius:var(--r-sm);overflow:hidden;background:var(--warm-orange);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--white);flex-shrink:0;}
+.sidebar-brand-name{font-size:13px;font-weight:600;color:var(--white);white-space:nowrap;}
+.sidebar-brand-sub{font-size:10px;color:var(--mid);white-space:nowrap;margin-top:1px;}
+.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto;overflow-x:hidden;}
+.nav-section-label{font-size:10px;font-weight:600;color:var(--mid);letter-spacing:.08em;text-transform:uppercase;padding:8px 10px 4px;white-space:nowrap;overflow:hidden;transition:opacity var(--tr);}
+.sidebar.collapsed .nav-section-label{opacity:0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r);color:var(--muted);cursor:pointer;margin-bottom:2px;transition:all var(--tr);white-space:nowrap;overflow:hidden;position:relative;}
+.nav-item:hover{background:var(--charcoal);color:var(--light);}
+.nav-item.active{background:rgba(200,134,74,.15);color:var(--warm-gold);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:2px;border-radius:0 2px 2px 0;background:var(--warm-orange);}
+.nav-item svg{width:17px;height:17px;flex-shrink:0;}
+.nav-item-label{font-size:13px;}
+.sidebar-bottom{padding:12px 8px;border-top:1px solid var(--charcoal);flex-shrink:0;}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r);overflow:hidden;}
+.sidebar-avatar{width:30px;height:30px;border-radius:50%;background:var(--warm-orange);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--white);flex-shrink:0;overflow:hidden;}
+.avatar-edit-wrap{position:relative;flex-shrink:0;cursor:pointer;}
+.avatar-edit-badge{position:absolute;bottom:-2px;right:-2px;width:14px;height:14px;border-radius:50%;background:var(--warm-orange);border:2px solid var(--dark);display:flex;align-items:center;justify-content:center;}
+.avatar-edit-badge svg{width:7px;height:7px;stroke:var(--white);}
+.sidebar-user-name{font-size:12px;font-weight:500;color:var(--light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sidebar-user-role{font-size:10px;color:var(--mid);white-space:nowrap;}
+.sidebar-collapse-btn{width:100%;padding:7px 10px;margin-top:4px;background:transparent;border:none;cursor:pointer;color:var(--mid);display:flex;align-items:center;gap:10px;border-radius:var(--r);transition:all var(--tr);font-family:inherit;font-size:12px;overflow:hidden;white-space:nowrap;}
+.sidebar-collapse-btn:hover{background:var(--charcoal);color:var(--light);}
+.sidebar-collapse-btn svg{width:16px;height:16px;flex-shrink:0;}
+
+/* ============ SYNC BAR ============ */
+.sync-bar{margin-top:4px;padding:8px 10px;border:1px solid var(--charcoal);border-radius:var(--r);background:rgba(255,255,255,.03);}
+.sync-status{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--mid);flex-shrink:0;transition:background .3s;}
+.sync-dot.online{background:#3D8A5E;}
+.sync-dot.syncing{background:#D4A55A;animation:pulse .9s infinite;}
+.sync-dot.error{background:var(--danger);}
+.sync-dot.offline{background:var(--mid);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.sync-status-text{font-size:10px;color:var(--mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.realtime-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:#3D8A5E;background:rgba(61,138,94,.12);padding:1px 6px;border-radius:10px;margin-top:2px;}
+.realtime-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:#3D8A5E;animation:pulse .9s infinite;}
+.sync-sql-block{background:var(--charcoal);border-radius:var(--r-sm);padding:8px 10px;font-family:monospace;font-size:10px;color:#D4A55A;margin-top:6px;white-space:pre;overflow-x:auto;line-height:1.6;}
+
+/* ============ MAIN AREA ============ */
+.main-area{flex:1;display:flex;flex-direction:column;margin-left:var(--sw);transition:margin-left var(--tr);min-width:0;}
+.main-area.sidebar-collapsed{margin-left:var(--sw-c);}
+.topbar{height:var(--tbh);background:var(--white);border-bottom:1px solid var(--pale);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:50;box-shadow:0 1px 0 var(--pale);}
+.topbar-hamburger{display:none;padding:6px;border:none;background:transparent;cursor:pointer;border-radius:var(--r);color:var(--mid);}
+.topbar-hamburger svg{width:20px;height:20px;display:block;}
+.topbar-title{font-size:15px;font-weight:600;color:var(--dark);}
+.topbar-lang{display:flex;gap:2px;background:var(--pale);border-radius:var(--r-sm);padding:2px;}
+.topbar-lang-btn{padding:3px 8px;border-radius:3px;font-size:11px;font-weight:500;cursor:pointer;transition:all var(--tr);color:var(--muted);border:none;background:transparent;font-family:inherit;}
+.topbar-lang-btn.active{background:var(--white);color:var(--dark);box-shadow:var(--sh-sm);}
+.page-content{flex:1;padding:24px;overflow-y:auto;}
+@media(max-width:768px){.page-content{padding:16px;}}
+@media(max-width:480px){.page-content{padding:12px;}}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.page-h1{font-size:20px;font-weight:600;color:var(--black);}
+.page-desc{font-size:13px;color:var(--muted);}
+
+/* ============ SEARCH ============ */
+.search-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+.search-input-wrap{position:relative;flex:1;min-width:200px;}
+.search-input-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted);pointer-events:none;}
+.search-input{width:100%;padding:9px 12px 9px 34px;border:1px solid var(--light);border-radius:var(--r);background:var(--white);font-family:inherit;font-size:13px;outline:none;transition:border-color var(--tr);}
+.search-input:focus{border-color:var(--warm-orange);}
+.filter-select{padding:8px 12px;border:1px solid var(--light);border-radius:var(--r);background:var(--white);font-family:inherit;font-size:13px;outline:none;cursor:pointer;color:var(--dark);}
+
+/* ============ DETAIL PANEL ============ */
+.detail-panel-overlay{position:fixed;inset:0;background:rgba(17,17,16,.4);z-index:199;display:none;}
+.detail-panel-overlay.visible{display:block;}
+.detail-panel{position:fixed;right:0;top:0;bottom:0;width:460px;max-width:95vw;background:var(--white);border-left:1px solid var(--pale);box-shadow:var(--sh-lg);z-index:200;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s ease;}
+.detail-panel.open{transform:translateX(0);}
+.detail-header{padding:18px 20px;border-bottom:1px solid var(--pale);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.detail-company-name{font-size:16px;font-weight:600;color:var(--black);}
+.detail-meta{font-size:12px;color:var(--muted);margin-top:3px;}
+.detail-tabs{display:flex;gap:0;border-bottom:1px solid var(--pale);overflow-x:auto;flex-shrink:0;}
+.detail-tab{padding:9px 16px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all var(--tr);white-space:nowrap;}
+.detail-tab:hover{color:var(--dark);}
+.detail-tab.active{color:var(--warm-orange);border-bottom-color:var(--warm-orange);}
+.detail-body{flex:1;overflow-y:auto;padding:20px;}
+.detail-section{margin-bottom:22px;}
+.detail-section-title{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--pale);}
+.detail-field{display:flex;gap:8px;margin-bottom:9px;}
+.detail-field-label{font-size:12px;color:var(--muted);width:88px;flex-shrink:0;padding-top:1px;}
+.detail-field-val{font-size:13px;color:var(--dark);flex:1;}
+.detail-footer{padding:14px 20px;border-top:1px solid var(--pale);display:flex;gap:8px;flex-wrap:wrap;}
+.timeline{display:flex;flex-direction:column;gap:0;}
+.timeline-item{display:flex;gap:12px;padding-bottom:16px;position:relative;}
+.timeline-item::before{content:'';position:absolute;left:7px;top:18px;bottom:0;width:1px;background:var(--pale);}
+.timeline-item:last-child::before{display:none;}
+.timeline-dot{width:16px;height:16px;border-radius:50%;background:var(--warm-sand);border:2px solid var(--warm-orange);flex-shrink:0;margin-top:2px;}
+.timeline-date{font-size:11px;color:var(--muted);}
+.timeline-text{font-size:13px;color:var(--dark);margin-top:2px;}
+.timeline-author{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* ============ MODAL ============ */
+.modal-overlay{position:fixed;inset:0;background:rgba(17,17,16,.5);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:var(--r-xl);padding:28px;max-width:580px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--sh-lg);}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.modal-title{font-size:16px;font-weight:600;color:var(--black);}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
+.policy-content{font-size:13px;color:var(--dark);line-height:1.8;max-height:60vh;overflow-y:auto;}
+.policy-content h3{font-size:14px;font-weight:600;margin:16px 0 6px;color:var(--black);}
+.policy-content p{margin-bottom:10px;color:var(--mid);}
+
+/* ============ ACCOUNT ROW ============ */
+.account-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--r);border:1px solid var(--pale);margin-bottom:8px;background:var(--white);transition:border-color var(--tr);}
+.account-row:hover{border-color:var(--light);}
+.account-actions{margin-left:auto;display:flex;gap:6px;}
+
+/* ============ SETTINGS ============ */
+.settings-card{background:var(--white);border-radius:var(--r-lg);border:1px solid var(--pale);overflow:hidden;margin-bottom:20px;}
+.settings-card-header{padding:16px 20px;border-bottom:1px solid var(--pale);background:var(--cream);display:flex;align-items:center;gap:10px;}
+.settings-card-title{font-size:14px;font-weight:600;color:var(--dark);}
+.settings-card-body{padding:20px;}
+
+/* ============ TABS ============ */
+.tab-list{display:flex;gap:0;border-bottom:1px solid var(--pale);margin-bottom:24px;overflow-x:auto;}
+.tab-item{padding:10px 18px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all var(--tr);white-space:nowrap;}
+.tab-item:hover{color:var(--dark);}
+.tab-item.active{color:var(--warm-orange);border-bottom-color:var(--warm-orange);}
+
+/* ============ LOADING SKELETON ============ */
+.skeleton{background:linear-gradient(90deg,var(--pale) 25%,var(--cream) 50%,var(--pale) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:var(--r-sm);}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.skeleton-row{height:44px;margin-bottom:8px;border-radius:var(--r);}
+
+/* ============ TOAST ============ */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:8px;align-items:flex-end;}
+.toast{background:var(--dark);color:var(--white);padding:11px 16px;border-radius:var(--r);font-size:13px;box-shadow:var(--sh-lg);display:flex;align-items:center;gap:8px;animation:slideIn .3s ease;border-left:3px solid var(--warm-orange);}
+.toast.success{border-left-color:var(--success);}
+.toast.danger{border-left-color:var(--danger);}
+.toast.warning{border-left-color:var(--warning);}
+@keyframes slideIn{from{transform:translateX(40px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+/* ============ SIDEBAR OVERLAY (MOBILE) ============ */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;display:none;}
+.sidebar-overlay.visible{display:block;}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);width:var(--sw)!important;box-shadow:var(--sh-lg);}
+  .sidebar.mobile-open{transform:translateX(0);}
+  .main-area{margin-left:0!important;}
+  .topbar-hamburger{display:flex;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .topbar-lang{display:none;}
+  .page-header{flex-direction:column;align-items:flex-start;}
+  .detail-panel{width:100%;}
+}
+@media(max-width:480px){
+  .stat-num{font-size:22px;}
+  .page-h1{font-size:17px;}
+  .modal{padding:20px;}
+  .login-box{margin:12px;}
+  .login-header,.login-form-area{padding-left:20px;padding-right:20px;}
+  .login-footer{padding-left:20px;padding-right:20px;flex-wrap:wrap;gap:8px;}
+}
+
+/* ============ CUST AVATAR ============ */
+.cust-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--white);flex-shrink:0;}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-state svg{width:48px;height:48px;margin-bottom:16px;opacity:.4;}
+.empty-title{font-size:15px;font-weight:500;color:var(--mid);margin-bottom:6px;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="page-login">
+  <div class="login-bg-texture"></div>
+  <div class="login-side"></div>
+  <div class="login-box">
+    <div class="login-header">
+      <div class="login-logo">
+        <div class="login-logo-mark" id="login-logo-mark">B</div>
+        <div>
+          <div class="login-logo-name" id="login-company-name">Bazaar Textile</div>
+          <div class="login-logo-sub" id="login-company-sub">CRM Management System</div>
+        </div>
+      </div>
+      <div class="login-headline" id="login-tagline">Down jacket &amp; outdoor sportswear fabric specialists</div>
+    </div>
+    <div class="login-form-area">
+      <div class="login-form-group">
+        <label class="login-label" id="lbl-username">USERNAME</label>
+        <input class="login-input" id="login-username" type="text" placeholder="Enter your username" autocomplete="username">
+      </div>
+      <div class="login-form-group">
+        <label class="login-label" id="lbl-password">PASSWORD</label>
+        <input class="login-input" id="login-password" type="password" placeholder="Enter your password" autocomplete="current-password">
+      </div>
+      <button class="login-btn" id="lbl-login-btn" onclick="doLogin()">Sign In</button>
+      <div class="login-error" id="login-error">Incorrect username or password</div>
+    </div>
+    <div class="login-footer">
+      <div class="lang-toggle">
+        <button class="lang-btn" onclick="setLang('zh')">中文</button>
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      </div>
+      <div class="login-policies">
+        <a class="policy-link" onclick="showPolicy('privacy')" id="lbl-privacy">Privacy Policy</a>
+        <a class="policy-link" onclick="showPolicy('security')" id="lbl-security">Security Policy</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app-shell">
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo-mark" id="sidebar-logo-mark">B</div>
+      <div style="overflow:hidden;">
+        <div class="sidebar-brand-name">Bazaar Textile</div>
+        <div class="sidebar-brand-sub">CRM System</div>
+      </div>
+    </div>
+    <div class="sidebar-nav" id="sidebar-nav"></div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="avatar-edit-wrap" onclick="el('avatar-file-input').click()">
+          <div class="sidebar-avatar" id="sidebar-avatar">A</div>
+          <div class="avatar-edit-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div>
+        </div>
+        <div style="overflow:hidden;">
+          <div class="sidebar-user-name" id="sidebar-username">Admin</div>
+          <div class="sidebar-user-role" id="sidebar-role">Super Admin</div>
+        </div>
+      </div>
+      <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarFile(this)">
+      <button class="sidebar-collapse-btn" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 9l-3 3 3 3"/></svg>
+        <span id="sidebar-collapse-label">Collapse</span>
+      </button>
+      <button class="sidebar-collapse-btn" onclick="doLogout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span id="lbl-logout">Sign Out</span>
+      </button>
+      <!-- SYNC BAR -->
+      <div class="sync-bar" id="sync-bar">
+        <div class="sync-status">
+          <span class="sync-dot" id="sync-dot"></span>
+          <span class="sync-status-text" id="sync-status-text">Not connected</span>
+        </div>
+        <div id="realtime-badge-wrap"></div>
+        <div style="display:flex;flex-direction:column;gap:2px;margin-top:4px;">
+          <button class="sidebar-collapse-btn hidden" id="btn-sync-settings" onclick="openSyncSettings()" style="margin-top:0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+            <span>DB Setup</span>
+          </button>
+          <button class="sidebar-collapse-btn" id="btn-sync-refresh" onclick="manualRefresh()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-area" id="main-area">
+    <div class="topbar">
+      <button class="topbar-hamburger" onclick="toggleMobileSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar-title" id="topbar-title">Dashboard</span>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+        <div class="topbar-lang">
+          <button class="topbar-lang-btn" onclick="setLang('zh')">中文</button>
+          <button class="topbar-lang-btn active" onclick="setLang('en')">EN</button>
+        </div>
+        <button class="btn-icon" onclick="doLogout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="page-content" id="page-content"></div>
+  </div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-panel-overlay" id="detail-overlay" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-header">
+    <div><div class="detail-company-name" id="detail-company"></div><div class="detail-meta" id="detail-meta"></div></div>
+    <button class="btn-icon" onclick="closeDetail()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="detail-tabs" id="detail-tabs"></div>
+  <div class="detail-body" id="detail-body"></div>
+  <div class="detail-footer" id="detail-footer"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Modal</div>
+      <button class="btn-icon" onclick="closeModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+/* ================================================================
+   STATE & LOCAL DEFAULTS
+   ================================================================ */
+const DEFAULT_STATE = {
+  lang: 'en',
+  sidebarCollapsed: false,
+  currentPage: 'dashboard',
+  currentUser: null,
+  settings: {
+    companyName: 'Bazaar Textile',
+    companySub: 'CRM Management System',
+    logo: null,
+    tagline: 'Down jacket & outdoor sportswear fabric specialists',
+    headerText: 'Bazaar Textile — Global Fabric Solutions',
+    footerText: '© 2025 Bazaar Textile Co., Ltd. All rights reserved.',
+    privacyPolicy: `<h3>Privacy Policy</h3><p>Last updated: January 2025</p><h3>1. Information We Collect</h3><p>Bazaar Textile CRM collects business contact information, company details, and transaction records entered by authorized users for the purpose of customer relationship management.</p><h3>2. How We Use Information</h3><p>All customer data is used solely for internal business operations including sales tracking, follow-up communications, and business analytics. We do not sell or share customer data with third parties.</p><h3>3. Data Protection</h3><p>Customer information is stored securely with access restricted to authorized personnel only. All data transmissions use industry-standard encryption protocols.</p><h3>4. User Rights</h3><p>Users may request to view, correct, or delete their data by contacting the system administrator.</p><h3>5. Contact</h3><p>For privacy-related inquiries, contact: admin@bazaartextile.com</p>`,
+    securityPolicy: `<h3>Security Policy</h3><p>Last updated: January 2025</p><h3>1. Account Security</h3><p>All users must maintain confidential passwords. Sharing login credentials is strictly prohibited.</p><h3>2. Access Control</h3><p>The system enforces role-based access control. Administrators can view all records. Sales staff can only access customers assigned to them.</p><h3>3. Data Integrity</h3><p>Sales staff may add new customer records but cannot modify or delete existing records. Only administrators have full edit and delete privileges.</p><h3>4. Audit Log</h3><p>All data modifications are logged with timestamps and user identification for security auditing purposes.</p>`
+  },
+  // Local-only accounts (fallback when Supabase is not configured)
+  accounts: [
+    { id: 'admin', username: 'admin', password: 'basha2025', role: 'superadmin', name: 'System Admin', status: 'active', createdAt: '2025-01-01', avatar: null },
+    { id: 'mgr01', username: 'manager01', password: 'mgr@2025', role: 'admin', name: 'Manager Li', status: 'active', createdAt: '2025-01-01', avatar: null },
+    { id: 'sales01', username: 'sales_wang', password: 'sales@2025', role: 'sales', name: 'Wang Lei', status: 'active', createdAt: '2025-01-01', avatar: null },
+    { id: 'sales02', username: 'sales_li', password: 'sales@2025', role: 'sales', name: 'Li Na', status: 'active', createdAt: '2025-01-10', avatar: null },
+    { id: 'sales03', username: 'sales_zhang', password: 'sales@2025', role: 'sales', name: 'Zhang Wei', status: 'active', createdAt: '2025-01-15', avatar: null }
+  ]
+};
+
+let STATE = JSON.parse(JSON.stringify(DEFAULT_STATE));
+
+// Per-table in-memory cache (populated from Supabase)
+const DB = {
+  customers: [],
+  contacts: [],    // { id, customer_id, name, position, email, whatsapp, linkedin }
+  products: [],    // { id, code, name, category, composition, feature, image_url }
+  follow_ups: [],  // { id, customer_id, content, next_action, follow_date }
+  quotations: [],  // { id, customer_id, product, price, status }
+  samples: [],     // { id, customer_id, product, tracking, status }
+  orders: []       // { id, customer_id, product, quantity, amount }
+};
+
+/* ================================================================
+   SUPABASE CONFIG & REST CLIENT
+   ================================================================ */
+let SUPA = { url: '', anonKey: '', configured: false };
+let realtimeSocket = null;
+let realtimeChannels = {};
+let autoRefreshTimer = null;
+
+function loadSupaConfig() {
+  try {
+    const raw = localStorage.getItem('bt_supa_config');
+    if (raw) { const c = JSON.parse(raw); if (c.url && c.anonKey) { SUPA = { ...c, configured: true }; } }
+  } catch(e) {}
+}
+function saveSupaConfig(cfg) {
+  SUPA = { url: cfg.url.replace(/\/$/, ''), anonKey: cfg.anonKey, configured: true };
+  localStorage.setItem('bt_supa_config', JSON.stringify(SUPA));
+}
+function clearSupaConfig() {
+  SUPA = { url: '', anonKey: '', configured: false };
+  localStorage.removeItem('bt_supa_config');
+}
+
+// Load local settings / accounts from localStorage
+function loadLocal() {
+  try {
+    const s = localStorage.getItem('bt_crm_local');
+    if (s) { const d = JSON.parse(s); STATE.settings = { ...STATE.settings, ...d.settings }; if (d.accounts) STATE.accounts = d.accounts; STATE.lang = d.lang || 'en'; }
+  } catch(e) {}
+}
+function saveLocal() {
+  localStorage.setItem('bt_crm_local', JSON.stringify({ settings: STATE.settings, accounts: STATE.accounts, lang: STATE.lang }));
+}
+
+function supaH(extra) {
+  return Object.assign({ 'apikey': SUPA.anonKey, 'Authorization': 'Bearer ' + SUPA.anonKey, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }, extra || {});
+}
+
+// Core REST: GET from a table
+async function sbGet(table, query) {
+  const url = `${SUPA.url}/rest/v1/${table}?${query || ''}`;
+  const r = await fetch(url, { headers: supaH() });
+  if (!r.ok) throw new Error(`GET ${table} failed: ${r.status}`);
+  return r.json();
+}
+// Core REST: INSERT
+async function sbInsert(table, body) {
+  const r = await fetch(`${SUPA.url}/rest/v1/${table}`, { method: 'POST', headers: supaH(), body: JSON.stringify(body) });
+  if (!r.ok) { const e = await r.text(); throw new Error(e); }
+  return r.json();
+}
+// Core REST: UPDATE (by id)
+async function sbUpdate(table, id, body) {
+  const r = await fetch(`${SUPA.url}/rest/v1/${table}?id=eq.${id}`, { method: 'PATCH', headers: supaH(), body: JSON.stringify(body) });
+  if (!r.ok) { const e = await r.text(); throw new Error(e); }
+  return r.json();
+}
+// Core REST: DELETE
+async function sbDelete(table, id) {
+  const r = await fetch(`${SUPA.url}/rest/v1/${table}?id=eq.${id}`, { method: 'DELETE', headers: supaH({ 'Prefer': 'return=minimal' }) });
+  if (!r.ok) throw new Error(`DELETE ${table} id=${id} failed: ${r.status}`);
+}
+// Core REST: UPSERT (for settings/accounts table)
+async function sbUpsert(table, body) {
+  const r = await fetch(`${SUPA.url}/rest/v1/${table}?on_conflict=id`, { method: 'POST', headers: supaH({ 'Prefer': 'resolution=merge-duplicates,return=representation' }), body: JSON.stringify(body) });
+  if (!r.ok) { const e = await r.text(); throw new Error(e); }
+  return r.json();
+}
+
+/* ================================================================
+   REALTIME (WebSocket) SUBSCRIPTIONS
+   ================================================================ */
+const RT_TABLES = ['customers','contacts','products','follow_ups','quotations','samples','orders'];
+
+function connectRealtime() {
+  if (!SUPA.configured) return;
+  disconnectRealtime();
+  // Supabase Realtime v2 WebSocket URL
+  const wsUrl = SUPA.url.replace('https://','wss://').replace('http://','ws://') + '/realtime/v1/websocket?apikey=' + SUPA.anonKey + '&vsn=1.0.0';
+  try {
+    realtimeSocket = new WebSocket(wsUrl);
+    realtimeSocket.onopen = () => {
+      setSyncStatus('online');
+      showRealtimeBadge(true);
+      // Subscribe to all business tables
+      RT_TABLES.forEach(tbl => {
+        const ref = 'sub_' + tbl;
+        const msg = { topic: `realtime:public:${tbl}`, event: 'phx_join', payload: { config: { broadcast: { self: false }, presence: {}, postgres_changes: [{ event: '*', schema: 'public', table: tbl }] } }, ref };
+        realtimeSocket.send(JSON.stringify(msg));
+        realtimeChannels[tbl] = ref;
+      });
+      // Heartbeat every 25s
+      startHeartbeat();
+    };
+    realtimeSocket.onmessage = (evt) => {
+      try { handleRealtimeMsg(JSON.parse(evt.data)); } catch(e) {}
+    };
+    realtimeSocket.onclose = () => {
+      showRealtimeBadge(false);
+      setSyncStatus(SUPA.configured ? 'error' : 'offline');
+      stopHeartbeat();
+      // Auto-reconnect after 5s
+      setTimeout(() => { if (SUPA.configured && STATE.currentUser) connectRealtime(); }, 5000);
+    };
+    realtimeSocket.onerror = () => { setSyncStatus('error'); };
+  } catch(e) { console.warn('Realtime WS failed:', e); }
+}
+
+let heartbeatTimer = null;
+let heartbeatRef = 0;
+function startHeartbeat() {
+  stopHeartbeat();
+  heartbeatTimer = setInterval(() => {
+    if (realtimeSocket && realtimeSocket.readyState === WebSocket.OPEN) {
+      realtimeSocket.send(JSON.stringify({ topic: 'phoenix', event: 'heartbeat', payload: {}, ref: ++heartbeatRef }));
+    }
+  }, 25000);
+}
+function stopHeartbeat() { if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; } }
+function disconnectRealtime() {
+  stopHeartbeat();
+  if (realtimeSocket) { try { realtimeSocket.close(); } catch(e) {} realtimeSocket = null; }
+  realtimeChannels = {};
+  showRealtimeBadge(false);
+}
+
+function handleRealtimeMsg(msg) {
+  if (!msg || !msg.payload) return;
+  const payload = msg.payload;
+  // postgres_changes event
+  if (payload.data && payload.data.table) {
+    const tbl = payload.data.table;
+    const evtType = payload.data.type; // INSERT / UPDATE / DELETE
+    const record = payload.data.record || payload.data.old_record;
+    if (!DB[tbl]) return;
+    if (evtType === 'INSERT') {
+      DB[tbl] = [record, ...DB[tbl].filter(r => r.id !== record.id)];
+    } else if (evtType === 'UPDATE') {
+      DB[tbl] = DB[tbl].map(r => r.id === record.id ? { ...r, ...record } : r);
+    } else if (evtType === 'DELETE') {
+      DB[tbl] = DB[tbl].filter(r => r.id !== record.id);
+    }
+    // Re-render current page if relevant
+    if (tbl === 'customers' || tbl === 'contacts' || tbl === 'follow_ups' || tbl === 'orders' || tbl === 'samples' || tbl === 'quotations') {
+      if (['dashboard','customers','followup'].includes(STATE.currentPage)) renderPage(STATE.currentPage);
+      // Refresh open detail panel
+      if (STATE.openDetailId) refreshDetailIfOpen(State.openDetailId);
+    }
+    showToast(`🔄 ${tbl.replace('_',' ')} updated`, '');
+  }
+}
+
+function showRealtimeBadge(on) {
+  const w = el('realtime-badge-wrap');
+  if (!w) return;
+  w.innerHTML = on ? `<div class="realtime-badge">Realtime Live</div>` : '';
+}
+
+/* ================================================================
+   LOAD ALL TABLES (parallel fetch)
+   ================================================================ */
+async function loadAllTables(opts) {
+  if (!SUPA.configured) return false;
+  opts = opts || {};
+  if (!opts.silent) setSyncStatus('syncing');
+  try {
+    const visFilter = isAdmin() ? '' : `&assigned_to=eq.${STATE.currentUser.id}`;
+    const [customers, contacts, products, follow_ups, quotations, samples, orders] = await Promise.all([
+      sbGet('customers', 'order=created_at.desc' + visFilter),
+      sbGet('contacts', 'order=created_at.desc'),
+      sbGet('products', 'order=created_at.desc'),
+      sbGet('follow_ups', 'order=follow_date.desc'),
+      sbGet('quotations', 'order=created_at.desc'),
+      sbGet('samples', 'order=created_at.desc'),
+      sbGet('orders', 'order=created_at.desc')
+    ]);
+    DB.customers = customers || [];
+    DB.contacts = contacts || [];
+    DB.products = products || [];
+    DB.follow_ups = follow_ups || [];
+    DB.quotations = quotations || [];
+    DB.samples = samples || [];
+    DB.orders = orders || [];
+    setSyncStatus('online');
+    return true;
+  } catch(e) {
+    console.warn('loadAllTables failed:', e);
+    setSyncStatus('error');
+    return false;
+  }
+}
+
+// Load only accounts + settings (crm_meta table)
+async function loadMeta() {
+  if (!SUPA.configured) return false;
+  try {
+    const rows = await sbGet('crm_meta', 'id=eq.default&select=*');
+    if (rows && rows.length) {
+      const m = rows[0];
+      if (m.accounts) STATE.accounts = m.accounts;
+      if (m.settings) STATE.settings = { ...STATE.settings, ...m.settings };
+      saveLocal();
+    }
+    return true;
+  } catch(e) { return false; }
+}
+async function saveMeta() {
+  if (!SUPA.configured) { saveLocal(); return; }
+  try {
+    await sbUpsert('crm_meta', [{ id: 'default', accounts: STATE.accounts, settings: STATE.settings, updated_at: new Date().toISOString() }]);
+    saveLocal();
+  } catch(e) { console.warn('saveMeta failed:', e); saveLocal(); }
+}
+
+/* ================================================================
+   SYNC STATUS UI
+   ================================================================ */
+function setSyncStatus(status) {
+  const dot = el('sync-dot'), text = el('sync-status-text');
+  if (!dot || !text) return;
+  dot.className = 'sync-dot ' + (status || 'offline');
+  const map = { online: '✓ Connected', syncing: 'Syncing…', error: 'Sync error', offline: 'Not connected' };
+  text.textContent = SUPA.configured ? (map[status] || map.offline) : 'No DB configured';
+}
+function renderSyncBarUI() {
+  const btn = el('btn-sync-settings');
+  if (btn) btn.classList.toggle('hidden', !isSuperAdmin());
+  setSyncStatus(SUPA.configured ? 'online' : 'offline');
+}
+async function manualRefresh() {
+  if (!SUPA.configured) { showToast('Connect Supabase first', 'warning'); return; }
+  setSyncStatus('syncing');
+  const ok = await loadAllTables();
+  if (ok) { renderPage(STATE.currentPage); showToast('Data refreshed', 'success'); }
+  else showToast('Refresh failed', 'danger');
+}
+
+/* ================================================================
+   SYNC SETTINGS MODAL (super admin)
+   ================================================================ */
+function openSyncSettings() {
+  if (!isSuperAdmin()) return;
+  el('modal-title').textContent = 'Supabase Database Setup';
+  el('modal-body').innerHTML = `
+    <div style="margin-bottom:16px;padding:12px;background:var(--info-bg);border-radius:var(--r);font-size:12px;color:var(--info);line-height:1.7;">
+      <strong>Multi-table architecture</strong> — Data is stored in 7 normalized tables.<br>
+      Run this SQL in your Supabase SQL Editor first, then enter connection details below.
+    </div>
+    <div class="sync-sql-block">-- 1. Settings & accounts meta table
+create table if not exists crm_meta (
+  id text primary key,
+  accounts jsonb,
+  settings jsonb,
+  updated_at timestamptz default now()
+);
+alter table crm_meta enable row level security;
+create policy "rw" on crm_meta for all using (true) with check (true);
+
+-- 2. Customers
+create table if not exists customers (
+  id uuid primary key default gen_random_uuid(),
+  company_name text, country text, website text,
+  source text, status text default 'New', level text default 'C',
+  notes text, assigned_to text, created_at timestamptz default now()
+);
+alter table customers enable row level security;
+create policy "rw" on customers for all using (true) with check (true);
+alter publication supabase_realtime add table customers;
+
+-- 3. Contacts
+create table if not exists contacts (
+  id uuid primary key default gen_random_uuid(),
+  customer_id uuid references customers(id) on delete cascade,
+  name text, position text, email text,
+  whatsapp text, linkedin text, created_at timestamptz default now()
+);
+alter table contacts enable row level security;
+create policy "rw" on contacts for all using (true) with check (true);
+alter publication supabase_realtime add table contacts;
+
+-- 4. Products
+create table if not exists products (
+  id uuid primary key default gen_random_uuid(),
+  code text, name text, category text,
+  composition text, feature text, image_url text,
+  created_at timestamptz default now()
+);
+alter table products enable row level security;
+create policy "rw" on products for all using (true) with check (true);
+alter publication supabase_realtime add table products;
+
+-- 5. Follow-Ups
+create table if not exists follow_ups (
+  id uuid primary key default gen_random_uuid(),
+  customer_id uuid references customers(id) on delete cascade,
+  content text, next_action text, author_id text, author_name text,
+  follow_date timestamptz default now()
+);
+alter table follow_ups enable row level security;
+create policy "rw" on follow_ups for all using (true) with check (true);
+alter publication supabase_realtime add table follow_ups;
+
+-- 6. Quotations
+create table if not exists quotations (
+  id uuid primary key default gen_random_uuid(),
+  customer_id uuid references customers(id) on delete cascade,
+  product text, price text, status text, created_at timestamptz default now()
+);
+alter table quotations enable row level security;
+create policy "rw" on quotations for all using (true) with check (true);
+alter publication supabase_realtime add table quotations;
+
+-- 7. Samples
+create table if not exists samples (
+  id uuid primary key default gen_random_uuid(),
+  customer_id uuid references customers(id) on delete cascade,
+  product text, tracking text, status text, created_at timestamptz default now()
+);
+alter table samples enable row level security;
+create policy "rw" on samples for all using (true) with check (true);
+alter publication supabase_realtime add table samples;
+
+-- 8. Orders
+create table if not exists orders (
+  id uuid primary key default gen_random_uuid(),
+  customer_id uuid references customers(id) on delete cascade,
+  product text, quantity text, amount numeric, created_at timestamptz default now()
+);
+alter table orders enable row level security;
+create policy "rw" on orders for all using (true) with check (true);
+alter publication supabase_realtime add table orders;</div>
+    <div class="form-group" style="margin-top:16px;"><label class="form-label">Supabase Project URL</label>
+      <input class="form-input" id="sb-url" placeholder="https://xxxxxxxx.supabase.co" value="${SUPA.url||''}"></div>
+    <div class="form-group" style="margin-top:12px;"><label class="form-label">Anon / Public Key</label>
+      <input class="form-input" id="sb-key" placeholder="eyJhbGciOi…" value="${SUPA.anonKey||''}"></div>
+    <div id="sync-test-result" style="font-size:12px;margin-top:10px;min-height:18px;"></div>
+  `;
+  el('modal-footer').innerHTML = `
+    ${SUPA.configured ? `<button class="btn btn-danger-outline" onclick="disconnectSupa()">Disconnect</button>` : ''}
+    <button class="btn btn-secondary" onclick="testSupa()">Test Connection</button>
+    <button class="btn btn-primary" onclick="saveSupa()">Connect & Sync</button>
+  `;
+  openModal();
+}
+async function testSupa() {
+  const url = (el('sb-url').value||'').trim().replace(/\/$/,'');
+  const key = (el('sb-key').value||'').trim();
+  const r = el('sync-test-result');
+  if (!url||!key) { r.innerHTML=`<span style="color:var(--danger)">Please fill in both fields</span>`; return; }
+  r.innerHTML=`<span style="color:var(--muted)">Testing…</span>`;
+  try {
+    const res = await fetch(`${url}/rest/v1/crm_meta?limit=1`, { headers: { apikey: key, Authorization: 'Bearer ' + key } });
+    if (res.ok) r.innerHTML=`<span style="color:var(--success)">✓ Connection successful! Tables ready.</span>`;
+    else r.innerHTML=`<span style="color:var(--danger)">Connection failed (${res.status}) — ensure SQL was executed in Supabase</span>`;
+  } catch(e) { r.innerHTML=`<span style="color:var(--danger)">Connection error: ${e.message}</span>`; }
+}
+async function saveSupa() {
+  const url = (el('sb-url').value||'').trim().replace(/\/$/,'');
+  const key = (el('sb-key').value||'').trim();
+  if (!url||!key) { showToast('Fill in URL and key', 'danger'); return; }
+  saveSupaConfig({ url, anonKey: key });
+  closeModal();
+  setSyncStatus('syncing');
+  await saveMeta();
+  await loadAllTables();
+  connectRealtime();
+  renderSyncBarUI();
+  renderPage(STATE.currentPage);
+  showToast('Connected! Realtime sync active ✓', 'success');
+}
+function disconnectSupa() {
+  clearSupaConfig();
+  disconnectRealtime();
+  closeModal();
+  renderSyncBarUI();
+  showToast('Disconnected from Supabase');
+}
+
+/* ================================================================
+   I18N
+   ================================================================ */
+const T = {
+  en: {
+    dashboard:'Dashboard', customers:'Customers', followUp:'Follow-Up',
+    accounts:'Accounts', settings:'Settings', signOut:'Sign Out',
+    superAdmin:'Super Admin', admin:'Admin', sales:'Sales',
+    username:'USERNAME', password:'PASSWORD', login:'Sign In',
+    loginError:'Incorrect username or password', loginChecking:'Verifying…',
+    privacy:'Privacy Policy', security:'Security Policy',
+    totalCustomers:'Total Customers', myCustomers:'My Customers',
+    activeDeals:'Closed Deals', newThisMonth:'New This Month',
+    teamMembers:'Team Members', pendingFollowUp:'Pending Follow-Up',
+    searchPlaceholder:'Search company, contact, country…',
+    allStatus:'All Status', status_New:'New', status_Following:'Following',
+    status_Closed:'Closed', status_Lost:'Lost',
+    addCustomer:'Add Customer', editCustomer:'Edit Customer', deleteCustomer:'Delete',
+    save:'Save', cancel:'Cancel', close:'Close',
+    company:'Company', country:'Country', type:'Type', website:'Website',
+    source:'Source', level:'Level', contact:'Contact', email:'Email',
+    phone:'Phone', whatsapp:'WhatsApp', linkedin:'LinkedIn',
+    status:'Status', product:'Product', assignTo:'Assign To', note:'Notes',
+    followUpTab:'Follow-Ups', quotationsTab:'Quotations', samplesTab:'Samples',
+    ordersTab:'Orders', contactsTab:'Contacts', infoTab:'Info',
+    allTypes:'All Types', brand:'Brand', importer:'Importer', retailer:'Retailer',
+    manufacturer:'Manufacturer', distributor:'Distributor',
+    nav_dashboard:'Dashboard', nav_customers:'Customers', nav_accounts:'Accounts',
+    nav_settings:'Settings', nav_followup:'Follow-Up', nav_products:'Products',
+    accountMgmt:'Account Management', addAccount:'Add Account',
+    accActive:'Active', accDisabled:'Disabled',
+    settingsTitle:'System Settings', branding:'Branding',
+    headerFooter:'Header & Footer', policies:'Policy Content',
+    companyNameLabel:'Company Name', taglineLabel:'Tagline',
+    companyLogo:'Company Logo', uploadLogo:'Upload Logo', removeLogo:'Remove',
+    saveSettings:'Save Settings', settingsSaved:'Settings saved',
+    customerAdded:'Customer added', customerSaved:'Changes saved',
+    customerDeleted:'Customer deleted', confirmDelete:'Delete this customer?',
+    readOnly:'You can add customers. Contact admin to edit or delete.',
+    collapse:'Collapse', expand:'Expand', allCountries:'All Countries',
+    assignedTo:'Assigned to', newPassword:'New Password', editAccount:'Edit Account',
+    accountSaved:'Account updated', accountAdded:'Account added',
+    addFollowUp:'Add Follow-Up', followUpContent:'Follow-Up Note',
+    nextAction:'Next Action', followDate:'Date',
+    followUpAdded:'Follow-up added', followUpDeleted:'Deleted',
+    confirmDeleteFollowUp:'Delete this follow-up?',
+    addQuotation:'Add Quotation', quotProductLabel:'Product',
+    quotPriceLabel:'Unit Price', quotStatusLabel:'Status',
+    quotAdded:'Quotation added', confirmDeleteQuot:'Delete this quotation?',
+    addSample:'Add Sample', sampleProductLabel:'Product/Spec',
+    sampleTrackingLabel:'Tracking No.', sampleStatusLabel:'Status',
+    sampleAdded:'Sample record added',
+    addOrder:'Add Order', orderProductLabel:'Product',
+    orderQtyLabel:'Quantity', orderAmtLabel:'Amount (USD)',
+    orderAdded:'Order added',
+    myAccountSecurity:'My Login Info',
+    currentPasswordLabel:'Current Password',
+    newUsernameLabel:'Username',
+    newPasswordLabelAcc:'New Password (blank to keep)',
+    confirmPasswordLabel:'Confirm New Password',
+    saveCredentials:'Update Login Info',
+    wrongCurrentPassword:'Current password is incorrect',
+    usernameRequired:'Username cannot be empty',
+    usernameTakenMsg:'Username already taken',
+    passwordMismatchMsg:'Passwords do not match',
+    credentialsSavedMsg:'Login info updated',
+    exportCustomers:'Export CSV',
+    writeFollowUpPlaceholder:'What happened? e.g. call, sample sent, quotation…',
+    productsPage:'Products', addProduct:'Add Product',
+    productCode:'Product Code', productName:'Product Name',
+    productCategory:'Category', productComposition:'Composition',
+    productFeature:'Features', productImageUrl:'Image URL',
+    productAdded:'Product added', productSaved:'Product saved', productDeleted:'Product deleted'
+  },
+  zh: {
+    dashboard:'仪表盘', customers:'客户管理', followUp:'跟进提醒',
+    accounts:'账号管理', settings:'系统设置', signOut:'退出登录',
+    superAdmin:'主管理员', admin:'副管理员', sales:'业务员',
+    username:'账号', password:'密码', login:'登录',
+    loginError:'账号或密码错误', loginChecking:'验证中…',
+    privacy:'隐私政策', security:'安全政策',
+    totalCustomers:'全部客户', myCustomers:'我的客户',
+    activeDeals:'已成交', newThisMonth:'本月新增',
+    teamMembers:'团队成员', pendingFollowUp:'待跟进',
+    searchPlaceholder:'搜索公司、联系人、国家…',
+    allStatus:'全部状态', status_New:'新客户', status_Following:'跟进中',
+    status_Closed:'已成交', status_Lost:'已流失',
+    addCustomer:'新增客户', editCustomer:'编辑客户', deleteCustomer:'删除',
+    save:'保存', cancel:'取消', close:'关闭',
+    company:'公司名称', country:'国家/地区', type:'客户类型', website:'网站',
+    source:'来源', level:'等级', contact:'联系人', email:'邮箱',
+    phone:'电话', whatsapp:'WhatsApp', linkedin:'LinkedIn',
+    status:'状态', product:'产品', assignTo:'负责业务员', note:'备注',
+    followUpTab:'跟进记录', quotationsTab:'报价记录', samplesTab:'样品记录',
+    ordersTab:'订单记录', contactsTab:'联系人', infoTab:'基本信息',
+    allTypes:'全部类型', brand:'品牌商', importer:'进口商', retailer:'零售商',
+    manufacturer:'制造商', distributor:'经销商',
+    nav_dashboard:'仪表盘', nav_customers:'客户管理', nav_accounts:'账号管理',
+    nav_settings:'系统设置', nav_followup:'跟进提醒', nav_products:'产品管理',
+    accountMgmt:'账号管理', addAccount:'新增账号',
+    accActive:'启用', accDisabled:'停用',
+    settingsTitle:'系统设置', branding:'品牌定制',
+    headerFooter:'页眉页尾', policies:'政策文案',
+    companyNameLabel:'公司名称', taglineLabel:'业务简介',
+    companyLogo:'公司Logo', uploadLogo:'上传Logo', removeLogo:'删除',
+    saveSettings:'保存设置', settingsSaved:'设置已保存',
+    customerAdded:'客户添加成功', customerSaved:'修改已保存',
+    customerDeleted:'客户已删除', confirmDelete:'确定删除该客户？',
+    readOnly:'你可以新增客户。修改或删除请联系管理员。',
+    collapse:'收起菜单', expand:'展开菜单', allCountries:'全部国家',
+    assignedTo:'负责人', newPassword:'新密码', editAccount:'编辑账号',
+    accountSaved:'账号已更新', accountAdded:'账号已添加',
+    addFollowUp:'新增跟进', followUpContent:'跟进内容',
+    nextAction:'下一步行动', followDate:'跟进日期',
+    followUpAdded:'跟进记录已添加', followUpDeleted:'已删除',
+    confirmDeleteFollowUp:'确定删除该跟进记录？',
+    addQuotation:'新增报价', quotProductLabel:'产品',
+    quotPriceLabel:'单价', quotStatusLabel:'状态',
+    quotAdded:'报价已添加', confirmDeleteQuot:'确定删除该报价？',
+    addSample:'新增样品', sampleProductLabel:'产品/规格',
+    sampleTrackingLabel:'快递单号', sampleStatusLabel:'状态',
+    sampleAdded:'样品记录已添加',
+    addOrder:'新增订单', orderProductLabel:'产品',
+    orderQtyLabel:'数量', orderAmtLabel:'金额(USD)',
+    orderAdded:'订单已添加',
+    myAccountSecurity:'我的登录信息',
+    currentPasswordLabel:'当前密码',
+    newUsernameLabel:'账号',
+    newPasswordLabelAcc:'新密码（不修改留空）',
+    confirmPasswordLabel:'确认新密码',
+    saveCredentials:'更新登录信息',
+    wrongCurrentPassword:'当前密码错误',
+    usernameRequired:'账号不能为空',
+    usernameTakenMsg:'账号已被使用',
+    passwordMismatchMsg:'两次密码不一致',
+    credentialsSavedMsg:'登录信息已更新',
+    exportCustomers:'导出CSV',
+    writeFollowUpPlaceholder:'记录跟进内容，例如：电话沟通、发送样品、报价…',
+    productsPage:'产品管理', addProduct:'新增产品',
+    productCode:'产品编号', productName:'产品名称',
+    productCategory:'分类', productComposition:'成分',
+    productFeature:'特点', productImageUrl:'图片URL',
+    productAdded:'产品已添加', productSaved:'产品已保存', productDeleted:'产品已删除'
+  }
+};
+
+function t(k) { return (T[STATE.lang] && T[STATE.lang][k]) || T.en[k] || k; }
+function setLang(lang) {
+  STATE.lang = lang;
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  saveLocal();
+  // Login page
+  el('lbl-username').textContent = t('username'); el('lbl-password').textContent = t('password');
+  el('lbl-login-btn').textContent = t('login'); el('lbl-privacy').textContent = t('privacy');
+  el('lbl-security').textContent = t('security'); el('login-error').textContent = t('loginError');
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === (lang==='zh'?'中文':'EN')));
+  document.querySelectorAll('.topbar-lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === (lang==='zh'?'中文':'EN')));
+  if (STATE.currentUser) { updateSidebarLabels(); renderPage(STATE.currentPage); }
+}
+
+/* ================================================================
+   HELPERS
+   ================================================================ */
+function el(id) { return document.getElementById(id); }
+function avatarColor(s) { const c=['#C8864A','#5C8A6A','#4A70A8','#9A5E9A','#7A6A4A','#5A8A9A','#A85E4A','#6A8A5A']; let h=0; for(let x of s) h=x.charCodeAt(0)+((h<<5)-h); return c[Math.abs(h)%c.length]; }
+function initials(n) { return n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+function statusBadge(s) { const m={New:'info',Following:'warning',Closed:'success',Lost:'neutral'}; return `<span class="badge badge-${m[s]||'neutral'}">${t('status_'+s)||s}</span>`; }
+function roleBadge(r) { if(r==='superadmin') return `<span class="badge badge-super">${t('superAdmin')}</span>`; if(r==='admin') return `<span class="badge badge-admin">${t('admin')}</span>`; return `<span class="badge badge-neutral">${t('sales')}</span>`; }
+function isAdmin() { return STATE.currentUser && (STATE.currentUser.role==='admin'||STATE.currentUser.role==='superadmin'); }
+function isSuperAdmin() { return STATE.currentUser && STATE.currentUser.role==='superadmin'; }
+function salesName(id) { const a=STATE.accounts.find(a=>a.id===id); return a?a.name:id; }
+function fmtDate(d) { if(!d) return '—'; return new Date(d).toLocaleDateString(STATE.lang==='zh'?'zh-CN':'en-GB', { year:'numeric',month:'short',day:'numeric' }); }
+function fmtAmt(n) { return n != null ? '$' + parseFloat(n).toLocaleString('en-US',{minimumFractionDigits:0}) : '—'; }
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function showToast(msg, type='') {
+  const d=document.createElement('div'); d.className='toast '+type;
+  d.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${msg}`;
+  el('toast-container').appendChild(d); setTimeout(()=>d.remove(),3200);
+}
+
+// Visible customers based on role
+function visibleCustomers() {
+  if (isAdmin()) return DB.customers;
+  return DB.customers.filter(c => c.assigned_to === STATE.currentUser.id);
+}
+// Related records for a customer id
+function custContacts(id) { return DB.contacts.filter(c=>c.customer_id===id); }
+function custFollowUps(id) { return DB.follow_ups.filter(f=>f.customer_id===id); }
+function custQuotations(id) { return DB.quotations.filter(q=>q.customer_id===id); }
+function custSamples(id) { return DB.samples.filter(s=>s.customer_id===id); }
+function custOrders(id) { return DB.orders.filter(o=>o.customer_id===id); }
+
+/* ================================================================
+   AUTH
+   ================================================================ */
+async function doLogin() {
+  const u = el('login-username').value.trim(), p = el('login-password').value;
+  const btn = el('lbl-login-btn');
+  btn.textContent = t('loginChecking'); btn.disabled = true;
+  if (SUPA.configured) await loadMeta();
+  btn.textContent = t('login'); btn.disabled = false;
+  const acc = STATE.accounts.find(a=>a.username===u && a.password===p && a.status==='active');
+  if (!acc) {
+    el('login-error').style.display = 'block';
+    el('login-username').style.borderColor = '#c0392b';
+    return;
+  }
+  STATE.currentUser = acc;
+  el('login-error').style.display = 'none';
+  el('page-login').style.display = 'none';
+  el('app-shell').classList.add('visible');
+  await initApp();
+}
+el('login-password').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+el('login-username').addEventListener('keydown', e => { if (e.key==='Enter') el('login-password').focus(); });
+
+function doLogout() {
+  STATE.currentUser = null;
+  disconnectRealtime();
+  el('app-shell').classList.remove('visible');
+  el('page-login').style.display = 'flex';
+  el('login-username').value = ''; el('login-password').value = '';
+  el('login-username').style.borderColor = '';
+}
+
+/* ================================================================
+   SIDEBAR & ROUTING
+   ================================================================ */
+const NAV_ICONS = {
+  home:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+  users:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  bell:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
+  shield:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  sliders:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>`,
+  box:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>`
+};
+
+function buildNav() {
+  const items = [
+    { id:'dashboard', icon:'home', label:'nav_dashboard' },
+    { id:'customers', icon:'users', label:'nav_customers' },
+    { id:'followup', icon:'bell', label:'nav_followup' },
+  ];
+  if (isAdmin()) {
+    items.push({ id:'products', icon:'box', label:'nav_products' });
+    items.push({ id:'accounts', icon:'shield', label:'nav_accounts' });
+  }
+  if (isSuperAdmin()) items.push({ id:'settings', icon:'sliders', label:'nav_settings' });
+  return items;
+}
+function renderSidebar() {
+  el('sidebar-nav').innerHTML = buildNav().map(item => `
+    <div class="nav-item${STATE.currentPage===item.id?' active':''}" onclick="navigate('${item.id}')">
+      ${NAV_ICONS[item.icon]}<span class="nav-item-label">${t(item.label)}</span>
+    </div>`).join('');
+}
+function updateSidebarLabels() {
+  renderSidebar();
+  el('sidebar-username').textContent = STATE.currentUser.name;
+  el('sidebar-role').textContent = t(STATE.currentUser.role==='superadmin'?'superAdmin':STATE.currentUser.role==='admin'?'admin':'sales');
+  renderSidebarAvatar();
+  el('lbl-logout').textContent = t('signOut');
+  const cl = el('sidebar-collapse-label'); if(cl) cl.textContent = STATE.sidebarCollapsed?t('expand'):t('collapse');
+}
+function toggleSidebar() {
+  STATE.sidebarCollapsed = !STATE.sidebarCollapsed;
+  el('sidebar').classList.toggle('collapsed', STATE.sidebarCollapsed);
+  el('main-area').classList.toggle('sidebar-collapsed', STATE.sidebarCollapsed);
+}
+function toggleMobileSidebar() { el('sidebar').classList.toggle('mobile-open'); el('sidebar-overlay').classList.toggle('visible'); }
+function closeMobileSidebar() { el('sidebar').classList.remove('mobile-open'); el('sidebar-overlay').classList.remove('visible'); }
+function navigate(page) { STATE.currentPage=page; closeMobileSidebar(); renderSidebar(); renderPage(page); el('topbar-title').textContent=t('nav_'+page)||page; }
+function renderPage(page) { const map={dashboard:renderDashboard,customers:renderCustomers,followup:renderFollowUp,accounts:renderAccounts,settings:renderSettings,products:renderProducts}; if(map[page]) map[page](); }
+
+/* ================================================================
+   AVATAR
+   ================================================================ */
+function renderSidebarAvatar() {
+  const u=STATE.currentUser; if(!u) return;
+  const box=el('sidebar-avatar'); if(!box) return;
+  if(u.avatar) box.innerHTML=`<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover;">`;
+  else { box.innerHTML=''; box.textContent=initials(u.name); }
+}
+function handleAvatarFile(input) {
+  const file=input.files&&input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image(); img.onload=function(){
+      const c=document.createElement('canvas'); c.width=c.height=160;
+      const ctx=c.getContext('2d'); const sc=Math.max(160/img.width,160/img.height);
+      ctx.drawImage(img,(160-img.width*sc)/2,(160-img.height*sc)/2,img.width*sc,img.height*sc);
+      STATE.currentUser.avatar=c.toDataURL('image/jpeg',.85);
+      const a=STATE.accounts.find(a=>a.id===STATE.currentUser.id); if(a) a.avatar=STATE.currentUser.avatar;
+      saveMeta(); renderSidebarAvatar(); showToast('Avatar updated','success');
+    }; img.src=e.target.result;
+  }; reader.readAsDataURL(file); input.value='';
+}
+
+/* ================================================================
+   LOGO
+   ================================================================ */
+function renderLogo() {
+  const logo=STATE.settings.logo; const html=logo?`<img src="${logo}">`:'B';
+  const l1=el('login-logo-mark'),l2=el('sidebar-logo-mark');
+  if(l1) l1.innerHTML=html; if(l2) l2.innerHTML=html;
+}
+
+/* ================================================================
+   DASHBOARD
+   ================================================================ */
+function renderDashboard() {
+  const all = visibleCustomers();
+  const now = new Date();
+  const thisMonth = all.filter(c => { const d=new Date(c.created_at); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+  const closed = all.filter(c=>c.status==='Closed');
+  const following = all.filter(c=>c.status==='Following'||c.status==='New');
+  const activeAcc = STATE.accounts.filter(a=>a.status==='active'&&a.role==='sales').length;
+  const recent = [...all].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,8);
+
+  const stats = isAdmin() ? [
+    { num:all.length, lbl:t('totalCustomers'), sub:`+${thisMonth.length} ${t('newThisMonth')}` },
+    { num:closed.length, lbl:t('activeDeals'), sub:`${Math.round(closed.length/Math.max(all.length,1)*100)}% rate` },
+    { num:following.length, lbl:t('pendingFollowUp'), sub:'Requiring attention' },
+    { num:activeAcc, lbl:t('teamMembers'), sub:'Active sales staff' }
+  ] : [
+    { num:all.length, lbl:t('myCustomers'), sub:`+${thisMonth.length} ${t('newThisMonth')}` },
+    { num:closed.length, lbl:t('activeDeals'), sub:`${Math.round(closed.length/Math.max(all.length,1)*100)}% rate` },
+    { num:following.length, lbl:t('pendingFollowUp'), sub:'Need follow-up' }
+  ];
+
+  el('page-content').innerHTML = `
+    <div class="page-header">
+      <div><div class="page-h1">${t('dashboard')}</div><div class="page-desc">${STATE.settings.companyName} · ${STATE.currentUser.name}</div></div>
+      ${isAdmin()?`<button class="btn btn-primary" onclick="openAddCustomer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ${t('addCustomer')}</button>`:''}
+    </div>
+    <div class="stat-grid">${stats.map(s=>`<div class="stat-card"><div class="stat-num">${s.num}</div><div class="stat-lbl">${s.lbl}</div><div class="stat-sub">${s.sub}</div></div>`).join('')}</div>
+    <div class="card" style="padding:0;">
+      <div style="padding:16px 20px 0;"><div class="card-title" style="margin-bottom:0;">${t('recentCustomers')}</div></div>
+      <div class="table-wrap"><table class="table">
+        <thead><tr>
+          <th>${t('company')}</th><th>${t('country')}</th><th>${t('status')}</th>
+          ${isAdmin()?`<th>${t('assignedTo')}</th>`:''}
+          <th>${t('followUpTab')}</th><th>${t('ordersTab')}</th>
+        </tr></thead>
+        <tbody>${recent.map(c=>{
+          const fus=custFollowUps(c.id).length, ords=custOrders(c.id).length;
+          return `<tr onclick="openDetail('${c.id}')">
+            <td><div style="display:flex;align-items:center;gap:10px;">
+              <div class="cust-avatar" style="background:${avatarColor(c.company_name)}">${initials(c.company_name)}</div>
+              <div><div style="font-weight:500;">${c.company_name}</div><div style="font-size:11px;color:var(--muted);">${c.level||''} · ${c.source||''}</div></div>
+            </div></td>
+            <td>${c.country||'—'}</td>
+            <td>${statusBadge(c.status)}</td>
+            ${isAdmin()?`<td style="font-size:12px;">${salesName(c.assigned_to)}</td>`:''}
+            <td style="font-size:12px;color:var(--muted);">${fus>0?`<span style="color:var(--warm-orange);font-weight:500;">${fus}</span>`:'—'}</td>
+            <td style="font-size:12px;color:var(--muted);">${ords>0?`<span style="color:var(--success);font-weight:500;">${ords}</span>`:'—'}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table></div>
+    </div>`;
+}
+
+/* ================================================================
+   CUSTOMERS LIST
+   ================================================================ */
+let custF = { search:'', status:'', country:'' };
+function renderCustomers() {
+  let list = visibleCustomers();
+  if (custF.search) { const q=custF.search.toLowerCase(); list=list.filter(c=>c.company_name?.toLowerCase().includes(q)||c.country?.toLowerCase().includes(q)); }
+  if (custF.status) list=list.filter(c=>c.status===custF.status);
+  if (custF.country) list=list.filter(c=>c.country===custF.country);
+  const countries=[...new Set(visibleCustomers().map(c=>c.country).filter(Boolean))].sort();
+
+  el('page-content').innerHTML = `
+    <div class="page-header">
+      <div><div class="page-h1">${isAdmin()?t('totalCustomers'):t('myCustomers')}</div><div class="page-desc">${list.length} records</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${isSuperAdmin()?`<button class="btn btn-secondary" onclick="exportCSV()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> ${t('exportCustomers')}</button>`:''}
+        <button class="btn btn-primary" onclick="openAddCustomer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ${t('addCustomer')}</button>
+      </div>
+    </div>
+    <div class="search-bar">
+      <div class="search-input-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="search-input" placeholder="${t('searchPlaceholder')}" value="${custF.search}" oninput="custF.search=this.value;renderCustomers()"></div>
+      <select class="filter-select" onchange="custF.status=this.value;renderCustomers()">
+        <option value="">${t('allStatus')}</option>
+        ${['New','Following','Closed','Lost'].map(s=>`<option value="${s}" ${custF.status===s?'selected':''}>${t('status_'+s)}</option>`).join('')}
+      </select>
+      <select class="filter-select" onchange="custF.country=this.value;renderCustomers()">
+        <option value="">${t('allCountries')}</option>
+        ${countries.map(c=>`<option value="${c}" ${custF.country===c?'selected':''}>${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="card" style="padding:0;"><div class="table-wrap"><table class="table">
+      <thead><tr>
+        <th>${t('company')}</th><th>${t('country')}</th><th>${t('level')}</th>
+        <th>${t('status')}</th>${isAdmin()?`<th>${t('assignedTo')}</th>`:''}
+        <th>${t('followUpTab')}</th><th>${t('ordersTab')}</th><th></th>
+      </tr></thead>
+      <tbody>${list.length===0?`<tr><td colspan="${isAdmin()?8:7}" style="text-align:center;padding:40px;color:var(--muted);">No records found</td></tr>`:
+      list.map(c=>{
+        const fus=custFollowUps(c.id).length, ords=custOrders(c.id).length;
+        return `<tr onclick="openDetail('${c.id}')">
+          <td><div style="display:flex;align-items:center;gap:10px;">
+            <div class="cust-avatar" style="background:${avatarColor(c.company_name)}">${initials(c.company_name)}</div>
+            <div><div style="font-weight:500;font-size:13px;">${c.company_name}</div><div style="font-size:11px;color:var(--muted);">${c.source||''}</div></div>
+          </div></td>
+          <td>${c.country||'—'}</td>
+          <td><span class="badge badge-neutral" style="font-size:10px;">${c.level||'C'}</span></td>
+          <td>${statusBadge(c.status)}</td>
+          ${isAdmin()?`<td style="font-size:12px;">${salesName(c.assigned_to)}</td>`:''}
+          <td style="font-size:12px;">${fus?`<span style="color:var(--warm-orange);font-weight:500;">${fus}</span>`:'—'}</td>
+          <td style="font-size:12px;">${ords?`<span style="color:var(--success);font-weight:500;">${ords}</span>`:'—'}</td>
+          <td onclick="event.stopPropagation()"><div style="display:flex;gap:4px;">
+            ${isAdmin()?`<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openEditCustomer('${c.id}')">Edit</button>`:''}
+          </div></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div></div>
+    ${!isAdmin()?`<div style="margin-top:12px;padding:10px 14px;background:var(--info-bg);border-radius:var(--r);font-size:12px;color:var(--info);">ℹ ${t('readOnly')}</div>`:''}`;
+}
+
+/* ================================================================
+   FOLLOW-UP PAGE
+   ================================================================ */
+function renderFollowUp() {
+  const list = visibleCustomers().filter(c=>c.status==='Following'||c.status==='New');
+  el('page-content').innerHTML = `
+    <div class="page-header"><div><div class="page-h1">${t('followUp')}</div><div class="page-desc">${list.length} customers need attention</div></div></div>
+    ${list.length===0?`<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><div class="empty-title">All caught up!</div></div>`:''}
+    ${list.map(c=>{
+      const fus=custFollowUps(c.id);
+      const last=fus.length>0?fus[0]:null;
+      return `<div class="card" style="margin-bottom:12px;cursor:pointer;" onclick="openDetail('${c.id}')">
+        <div style="display:flex;align-items:flex-start;gap:14px;">
+          <div class="cust-avatar" style="background:${avatarColor(c.company_name)};width:40px;height:40px;font-size:13px;">${initials(c.company_name)}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+              <span style="font-weight:600;">${c.company_name}</span>${statusBadge(c.status)}
+            </div>
+            <div style="font-size:12px;color:var(--muted);">${c.country||''} ${isAdmin()?'· '+salesName(c.assigned_to):''}</div>
+            ${last?`<div style="font-size:12px;color:var(--mid);margin-top:8px;padding:8px;background:var(--cream);border-radius:var(--r-sm);"><strong>${fmtDate(last.follow_date)}</strong> — ${last.content}</div>`:''}
+          </div>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+/* ================================================================
+   CUSTOMER DETAIL PANEL — TABBED
+   ================================================================ */
+let detailActiveTab = 'info';
+STATE.openDetailId = null;
+
+function openDetail(id) {
+  STATE.openDetailId = id;
+  renderDetailPanel(id, detailActiveTab);
+  el('detail-panel').classList.add('open');
+  el('detail-overlay').classList.add('visible');
+}
+function closeDetail() {
+  el('detail-panel').classList.remove('open');
+  el('detail-overlay').classList.remove('visible');
+  STATE.openDetailId = null;
+  detailActiveTab = 'info';
+}
+function refreshDetailIfOpen(id) { if(STATE.openDetailId===id) renderDetailPanel(id, detailActiveTab); }
+
+function renderDetailPanel(id, tab) {
+  detailActiveTab = tab;
+  const c = DB.customers.find(x=>x.id===id); if(!c) return;
+  el('detail-company').textContent = c.company_name;
+  el('detail-meta').textContent = `${c.level||'C'} · ${c.country||''} · ${c.source||''}`;
+
+  const tabs = [
+    { id:'info', label:t('infoTab') },
+    { id:'contacts', label:t('contactsTab') },
+    { id:'followups', label:`${t('followUpTab')} (${custFollowUps(id).length})` },
+    { id:'quotations', label:`${t('quotationsTab')} (${custQuotations(id).length})` },
+    { id:'samples', label:`${t('samplesTab')} (${custSamples(id).length})` },
+    { id:'orders', label:`${t('ordersTab')} (${custOrders(id).length})` },
+  ];
+  el('detail-tabs').innerHTML = tabs.map(tb=>`<div class="detail-tab${tab===tb.id?' active':''}" onclick="renderDetailPanel('${id}','${tb.id}')">${tb.label}</div>`).join('');
+
+  let body = '';
+  if (tab==='info') {
+    body = `<div class="detail-section">
+      <div class="detail-section-title">${t('infoTab')}</div>
+      <div class="detail-field"><div class="detail-field-label">${t('company')}</div><div class="detail-field-val" style="font-weight:500;">${c.company_name}</div></div>
+      <div class="detail-field"><div class="detail-field-label">${t('country')}</div><div class="detail-field-val">${c.country||'—'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">${t('website')}</div><div class="detail-field-val">${c.website?`<a href="${c.website}" target="_blank" style="color:var(--warm-orange);">${c.website}</a>`:'—'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">${t('source')}</div><div class="detail-field-val">${c.source||'—'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">${t('level')}</div><div class="detail-field-val"><span class="badge badge-neutral">${c.level||'C'}</span></div></div>
+      <div class="detail-field"><div class="detail-field-label">${t('status')}</div><div class="detail-field-val">${statusBadge(c.status)}</div></div>
+      ${isAdmin()?`<div class="detail-field"><div class="detail-field-label">${t('assignedTo')}</div><div class="detail-field-val">${salesName(c.assigned_to)}</div></div>`:''}
+      ${c.notes?`<div class="detail-field"><div class="detail-field-label">${t('note')}</div><div class="detail-field-val" style="font-size:12px;color:var(--mid);">${c.notes}</div></div>`:''}
+    </div>`;
+  } else if (tab==='contacts') {
+    const contacts = custContacts(id);
+    body = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <span class="detail-section-title" style="margin:0;padding:0;border:none;">${t('contactsTab')}</span>
+        ${isAdmin()?`<button class="btn btn-primary btn-sm" onclick="openAddContact('${id}')">+ Add</button>`:''}
+      </div>
+      ${contacts.length===0?'<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No contacts yet</div>':''}
+      ${contacts.map(ct=>`<div class="account-row" style="margin-bottom:8px;">
+        <div class="cust-avatar" style="background:${avatarColor(ct.name||'X')}">${initials(ct.name||'?')}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:500;font-size:13px;">${ct.name||'—'}</div>
+          <div style="font-size:11px;color:var(--muted);">${ct.position||''}</div>
+          ${ct.email?`<div style="font-size:12px;"><a href="mailto:${ct.email}" style="color:var(--warm-orange);">${ct.email}</a></div>`:''}
+          ${ct.whatsapp?`<div style="font-size:12px;color:var(--mid);">WA: ${ct.whatsapp}</div>`:''}
+          ${ct.linkedin?`<div style="font-size:12px;color:var(--mid);">LI: ${ct.linkedin}</div>`:''}
+        </div>
+        ${isAdmin()?`<button class="btn-icon" onclick="deleteContact('${ct.id}','${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`:''}
+      </div>`).join('')}`;
+  } else if (tab==='followups') {
+    const fus = custFollowUps(id);
+    body = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <span class="detail-section-title" style="margin:0;padding:0;border:none;">${t('followUpTab')}</span>
+        <button class="btn btn-primary btn-sm" onclick="openAddFollowUp('${id}')">+ ${t('addFollowUp')}</button>
+      </div>
+      ${fus.length===0?'<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No follow-ups yet</div>':''}
+      <div class="timeline">${fus.map(f=>`<div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div style="flex:1;">
+          <div class="timeline-date">${fmtDate(f.follow_date)}</div>
+          <div class="timeline-text">${f.content}</div>
+          ${f.next_action?`<div style="margin-top:4px;padding:5px 8px;background:var(--warm-linen);border-radius:var(--r-sm);font-size:11px;color:var(--warm-deep);">→ ${f.next_action}</div>`:''}
+          <div class="timeline-author">${f.author_name||'—'}</div>
+        </div>
+        ${isAdmin()?`<button class="btn-icon" onclick="deleteFollowUp('${f.id}','${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>`:''}
+      </div>`).join('')}</div>`;
+  } else if (tab==='quotations') {
+    const quots = custQuotations(id);
+    body = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <span class="detail-section-title" style="margin:0;padding:0;border:none;">${t('quotationsTab')}</span>
+        ${isAdmin()?`<button class="btn btn-primary btn-sm" onclick="openAddQuotation('${id}')">+ ${t('addQuotation')}</button>`:''}
+      </div>
+      ${quots.length===0?'<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No quotations yet</div>':''}
+      ${quots.map(q=>`<div class="account-row" style="margin-bottom:8px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:500;font-size:13px;">${q.product||'—'}</div>
+          <div style="font-size:12px;color:var(--mid);">Price: <strong>${q.price||'—'}</strong></div>
+          <div style="font-size:11px;color:var(--muted);">${fmtDate(q.created_at)}</div>
+        </div>
+        <span class="badge badge-neutral" style="font-size:10px;">${q.status||'—'}</span>
+        ${isAdmin()?`<button class="btn-icon" onclick="deleteQuotation('${q.id}','${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>`:''}
+      </div>`).join('')}`;
+  } else if (tab==='samples') {
+    const smpls = custSamples(id);
+    body = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <span class="detail-section-title" style="margin:0;padding:0;border:none;">${t('samplesTab')}</span>
+        <button class="btn btn-primary btn-sm" onclick="openAddSample('${id}')">+ ${t('addSample')}</button>
+      </div>
+      ${smpls.length===0?'<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No sample records yet</div>':''}
+      ${smpls.map(s=>`<div class="account-row" style="margin-bottom:8px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:500;font-size:13px;">${s.product||'—'}</div>
+          ${s.tracking?`<div style="font-size:12px;color:var(--mid);">Tracking: <strong>${s.tracking}</strong></div>`:''}
+          <div style="font-size:11px;color:var(--muted);">${fmtDate(s.created_at)}</div>
+        </div>
+        <span class="badge badge-info" style="font-size:10px;">${s.status||'—'}</span>
+        ${isAdmin()?`<button class="btn-icon" onclick="deleteSample('${s.id}','${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>`:''}
+      </div>`).join('')}`;
+  } else if (tab==='orders') {
+    const ords = custOrders(id);
+    const total = ords.reduce((s,o)=>s+(parseFloat(o.amount)||0),0);
+    body = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <span class="detail-section-title" style="margin:0;padding:0;border:none;">${t('ordersTab')}</span>
+        ${isAdmin()?`<button class="btn btn-primary btn-sm" onclick="openAddOrder('${id}')">+ ${t('addOrder')}</button>`:''}
+      </div>
+      ${ords.length>0?`<div style="margin-bottom:14px;padding:12px 16px;background:var(--success-bg);border-radius:var(--r);display:flex;gap:24px;">
+        <div><div style="font-size:22px;font-weight:600;color:var(--success);">${fmtAmt(total)}</div><div style="font-size:11px;color:var(--muted);">Total Revenue</div></div>
+        <div><div style="font-size:22px;font-weight:600;color:var(--dark);">${ords.length}</div><div style="font-size:11px;color:var(--muted);">Orders</div></div>
+      </div>`:''}
+      ${ords.length===0?'<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No orders yet</div>':''}
+      ${ords.map(o=>`<div class="account-row" style="margin-bottom:8px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:500;font-size:13px;">${o.product||'—'}</div>
+          <div style="font-size:12px;color:var(--mid);">Qty: ${o.quantity||'—'}</div>
+          <div style="font-size:11px;color:var(--muted);">${fmtDate(o.created_at)}</div>
+        </div>
+        <div style="font-weight:600;color:var(--success);">${fmtAmt(o.amount)}</div>
+        ${isAdmin()?`<button class="btn-icon" onclick="deleteOrder('${o.id}','${id}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>`:''}
+      </div>`).join('')}`;
+  }
+
+  el('detail-body').innerHTML = body;
+  el('detail-footer').innerHTML = `
+    ${isAdmin()?`<button class="btn btn-primary btn-sm" onclick="openEditCustomer('${id}')">Edit</button>`:''}
+    ${isAdmin()?`<button class="btn btn-danger-outline btn-sm" onclick="confirmDeleteCustomer('${id}')">Delete</button>`:''}
+    <button class="btn btn-secondary btn-sm" onclick="closeDetail()">Close</button>`;
+}
+
+/* ================================================================
+   CUSTOMER CRUD
+   ================================================================ */
+function salesOptions(cur) {
+  return STATE.accounts.filter(a=>a.role==='sales'&&a.status==='active')
+    .map(a=>`<option value="${a.id}" ${a.id===cur?'selected':''}>${a.name}</option>`).join('');
+}
+function customerForm(c) {
+  c=c||{};
+  const statusOpts=['New','Following','Closed','Lost'].map(s=>`<option value="${s}" ${c.status===s?'selected':''}>${t('status_'+s)}</option>`).join('');
+  return `
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">${t('company')} *</label><input class="form-input" id="f-company" value="${c.company_name||''}"></div>
+      <div class="form-group"><label class="form-label">${t('country')}</label><input class="form-input" id="f-country" value="${c.country||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">${t('status')}</label><select class="form-select" id="f-status">${statusOpts}</select></div>
+      <div class="form-group"><label class="form-label">${t('level')}</label>
+        <select class="form-select" id="f-level"><option value="A" ${c.level==='A'?'selected':''}>A — VIP</option><option value="B" ${c.level==='B'?'selected':''}>B — Active</option><option value="C" ${(!c.level||c.level==='C')?'selected':''}>C — Standard</option><option value="D" ${c.level==='D'?'selected':''}>D — Cold</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">${t('source')}</label><input class="form-input" id="f-source" value="${c.source||''}" placeholder="e.g. Alibaba, Trade show"></div>
+      <div class="form-group"><label class="form-label">${t('website')}</label><input class="form-input" id="f-website" type="url" value="${c.website||''}"></div>
+    </div>
+    <div class="form-group"><label class="form-label">${t('assignTo')}</label>
+      ${isAdmin()?`<select class="form-select" id="f-sales">${salesOptions(c.assigned_to||STATE.currentUser.id)}</select>`:`<input class="form-input" value="${STATE.currentUser.name}" disabled style="background:var(--pale);"><input type="hidden" id="f-sales" value="${STATE.currentUser.id}">`}
+    </div>
+    <div class="form-group"><label class="form-label">${t('note')}</label><textarea class="form-textarea" id="f-note">${c.notes||''}</textarea></div>`;
+}
+function openAddCustomer() {
+  el('modal-title').textContent=t('addCustomer');
+  el('modal-body').innerHTML=customerForm({});
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveNewCustomer()">${t('save')}</button>`;
+  openModal();
+}
+function openEditCustomer(id) {
+  if(!isAdmin()){showToast(t('readOnly'),'danger');return;}
+  const c=DB.customers.find(x=>x.id===id); if(!c) return;
+  el('modal-title').textContent=t('editCustomer');
+  el('modal-body').innerHTML=customerForm(c);
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveEditCustomer('${id}')">${t('save')}</button>`;
+  openModal();
+}
+async function saveNewCustomer() {
+  const company=el('f-company').value.trim();
+  if(!company){showToast('Company name is required','danger');return;}
+  const body={company_name:company,country:el('f-country').value.trim(),status:el('f-status').value,level:el('f-level').value,source:el('f-source').value.trim(),website:el('f-website').value.trim(),notes:el('f-note').value.trim(),assigned_to:el('f-sales').value};
+  if(!isAdmin()) body.assigned_to=STATE.currentUser.id;
+  if(SUPA.configured){
+    try{const rows=await sbInsert('customers',body);if(rows&&rows[0])DB.customers.unshift(rows[0]);}catch(e){showToast('Save failed: '+e.message,'danger');return;}
+  } else {
+    DB.customers.unshift({...body,id:genId(),created_at:new Date().toISOString()});
+  }
+  closeModal();renderCustomers();showToast(t('customerAdded'),'success');
+}
+async function saveEditCustomer(id) {
+  if(!isAdmin()){showToast(t('readOnly'),'danger');return;}
+  const body={company_name:el('f-company').value.trim(),country:el('f-country').value.trim(),status:el('f-status').value,level:el('f-level').value,source:el('f-source').value.trim(),website:el('f-website').value.trim(),notes:el('f-note').value.trim(),assigned_to:el('f-sales').value};
+  if(SUPA.configured){try{const rows=await sbUpdate('customers',id,body);if(rows&&rows[0]){const i=DB.customers.findIndex(x=>x.id===id);if(i>=0)DB.customers[i]={...DB.customers[i],...rows[0]};}}catch(e){showToast('Save failed','danger');return;}}
+  else{const i=DB.customers.findIndex(x=>x.id===id);if(i>=0)DB.customers[i]={...DB.customers[i],...body};}
+  closeModal();renderCustomers();showToast(t('customerSaved'),'success');
+}
+function confirmDeleteCustomer(id) {
+  if(!isAdmin()){return;}
+  const c=DB.customers.find(x=>x.id===id);
+  el('modal-title').textContent=t('deleteCustomer');
+  el('modal-body').innerHTML=`<p style="color:var(--mid);">${t('confirmDelete')}<br><strong>${c.company_name}</strong><br><br><span style="font-size:12px;color:var(--danger);">This will also delete all related contacts, follow-ups, quotations, samples, and orders.</span></p>`;
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-danger-outline" onclick="deleteCustomer('${id}')">${t('deleteCustomer')}</button>`;
+  openModal();
+}
+async function deleteCustomer(id) {
+  if(!isAdmin()) return;
+  if(SUPA.configured){try{await sbDelete('customers',id);}catch(e){showToast('Delete failed','danger');return;}}
+  // Remove from all local caches
+  DB.customers=DB.customers.filter(x=>x.id!==id);
+  ['contacts','follow_ups','quotations','samples','orders'].forEach(t=>{DB[t]=DB[t].filter(r=>r.customer_id!==id);});
+  closeModal();closeDetail();renderCustomers();showToast(t('customerDeleted'));
+}
+
+/* ================================================================
+   CONTACT CRUD
+   ================================================================ */
+function openAddContact(custId) {
+  el('modal-title').textContent='Add Contact';
+  el('modal-body').innerHTML=`
+    <div class="form-row"><div class="form-group"><label class="form-label">${t('contact')} *</label><input class="form-input" id="ct-name" placeholder="Full name"></div>
+    <div class="form-group"><label class="form-label">Position</label><input class="form-input" id="ct-pos" placeholder="e.g. Purchasing Manager"></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">${t('email')}</label><input class="form-input" id="ct-email" type="email"></div>
+    <div class="form-group"><label class="form-label">${t('whatsapp')}</label><input class="form-input" id="ct-wa"></div></div>
+    <div class="form-group"><label class="form-label">${t('linkedin')}</label><input class="form-input" id="ct-li" placeholder="LinkedIn URL or ID"></div>`;
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveContact('${custId}')">${t('save')}</button>`;
+  openModal();
+}
+async function saveContact(custId) {
+  const name=el('ct-name').value.trim(); if(!name){showToast('Name required','danger');return;}
+  const body={customer_id:custId,name,position:el('ct-pos').value.trim(),email:el('ct-email').value.trim(),whatsapp:el('ct-wa').value.trim(),linkedin:el('ct-li').value.trim()};
+  if(SUPA.configured){try{const rows=await sbInsert('contacts',body);if(rows&&rows[0])DB.contacts.unshift(rows[0]);}catch(e){showToast('Save failed','danger');return;}}
+  else DB.contacts.unshift({...body,id:genId(),created_at:new Date().toISOString()});
+  closeModal();renderDetailPanel(custId,'contacts');showToast('Contact added','success');
+}
+async function deleteContact(id,custId) {
+  if(SUPA.configured)try{await sbDelete('contacts',id);}catch(e){showToast('Delete failed','danger');return;}
+  DB.contacts=DB.contacts.filter(x=>x.id!==id);
+  renderDetailPanel(custId,'contacts');showToast('Deleted');
+}
+
+/* ================================================================
+   FOLLOW-UP CRUD
+   ================================================================ */
+function openAddFollowUp(custId) {
+  el('modal-title').textContent=t('addFollowUp');
+  el('modal-body').innerHTML=`
+    <div class="form-group"><label class="form-label">${t('followUpContent')} *</label>
+      <textarea class="form-textarea" id="fu-content" placeholder="${t('writeFollowUpPlaceholder')}"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">${t('nextAction')}</label><input class="form-input" id="fu-next" placeholder="e.g. Send samples"></div>
+      <div class="form-group"><label class="form-label">${t('followDate')}</label><input class="form-input" id="fu-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+    </div>`;
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveFollowUp('${custId}')">${t('save')}</button>`;
+  openModal();
+}
+async function saveFollowUp(custId) {
+  const content=el('fu-content').value.trim(); if(!content){showToast('Content required','danger');return;}
+  const body={customer_id:custId,content,next_action:el('fu-next').value.trim(),follow_date:el('fu-date').value,author_id:STATE.currentUser.id,author_name:STATE.currentUser.name};
+  if(SUPA.configured){try{const rows=await sbInsert('follow_ups',body);if(rows&&rows[0])DB.follow_ups.unshift(rows[0]);}catch(e){showToast('Save failed','danger');return;}}
+  else DB.follow_ups.unshift({...body,id:genId(),follow_date:new Date(body.follow_date).toISOString()});
+  closeModal();renderDetailPanel(custId,'followups');if(STATE.currentPage==='followup')renderFollowUp();showToast(t('followUpAdded'),'success');
+}
+async function deleteFollowUp(id,custId) {
+  if(!isAdmin()){showToast('Admin only','danger');return;}
+  if(SUPA.configured)try{await sbDelete('follow_ups',id);}catch(e){showToast('Delete failed','danger');return;}
+  DB.follow_ups=DB.follow_ups.filter(x=>x.id!==id);
+  renderDetailPanel(custId,'followups');showToast(t('followUpDeleted'));
+}
+
+/* ================================================================
+   QUOTATION CRUD
+   ================================================================ */
+function openAddQuotation(custId) {
+  el('modal-title').textContent=t('addQuotation');
+  el('modal-body').innerHTML=`
+    <div class="form-group"><label class="form-label">${t('quotProductLabel')} *</label><input class="form-input" id="qt-product" placeholder="e.g. 40D Ripstop Nylon 1500mm"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">${t('quotPriceLabel')}</label><input class="form-input" id="qt-price" placeholder="e.g. USD 2.80/yard"></div>
+      <div class="form-group"><label class="form-label">${t('quotStatusLabel')}</label>
+        <select class="form-select" id="qt-status"><option value="Pending">Pending</option><option value="Sent">Sent</option><option value="Accepted">Accepted</option><option value="Rejected">Rejected</option></select></div>
+    </div>`;
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveQuotation('${custId}')">${t('save')}</button>`;
+  openModal();
+}
+async function saveQuotation(custId) {
+  const product=el('qt-product').value.trim(); if(!product){showToast('Product required','danger');return;}
+  const body={customer_id:custId,product,price:el('qt-price').value.trim(),status:el('qt-status').value};
+  if(SUPA.configured){try{const rows=await sbInsert('quotations',body);if(rows&&rows[0])DB.quotations.unshift(rows[0]);}catch(e){showToast('Save failed','danger');return;}}
+  else DB.quotations.unshift({...body,id:genId(),created_at:new Date().toISOString()});
+  closeModal();renderDetailPanel(custId,'quotations');showToast(t('quotAdded'),'success');
+}
+async function deleteQuotation(id,custId) {
+  if(!isAdmin()) return;
+  if(SUPA.configured)try{await sbDelete('quotations',id);}catch(e){showToast('Delete failed','danger');return;}
+  DB.quotations=DB.quotations.filter(x=>x.id!==id);
+  renderDetailPanel(custId,'quotations');showToast('Deleted');
+}
+
+/* ================================================================
+   SAMPLE CRUD
+   ================================================================ */
+function openAddSample(custId) {
+  el('modal-title').textContent=t('addSample');
+  el('modal-body').innerHTML=`
+    <div class="form-group"><label class="form-label">${t('sampleProductLabel')} *</label><input class="form-input" id="sm-product" placeholder="e.g. 20D Down-proof fabric 50m"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">${t('sampleTrackingLabel')}</label><input class="form-input" id="sm-tracking" placeholder="DHL / FedEx tracking no."></div>
+      <div class="form-group"><label class="form-label">${t('sampleStatusLabel')}</label>
+        <select class="form-select" id="sm-status"><option value="Preparing">Preparing</option><option value="Sent">Sent</option><option value="Received">Received</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></div>
+    </div>`;
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveSample('${custId}')">${t('save')}</button>`;
+  openModal();
+}
+async function saveSample(custId) {
+  const product=el('sm-product').value.trim(); if(!product){showToast('Product required','danger');return;}
+  const body={customer_id:custId,product,tracking:el('sm-tracking').value.trim(),status:el('sm-status').value};
+  if(SUPA.configured){try{const rows=await sbInsert('samples',body);if(rows&&rows[0])DB.samples.unshift(rows[0]);}catch(e){showToast('Save failed','danger');return;}}
+  else DB.samples.unshift({...body,id:genId(),created_at:new Date().toISOString()});
+  closeModal();renderDetailPanel(custId,'samples');showToast(t('sampleAdded'),'success');
+}
+async function deleteSample(id,custId) {
+  if(SUPA.configured)try{await sbDelete('samples',id);}catch(e){showToast('Delete failed','danger');return;}
+  DB.samples=DB.samples.filter(x=>x.id!==id);
+  renderDetailPanel(custId,'samples');showToast('Deleted');
+}
+
+/* ================================================================
+   ORDER CRUD
+   ================================================================ */
+function openAddOrder(custId) {
+  el('modal-title').textContent=t('addOrder');
+  el('modal-body').innerHTML=`
+    <div class="form-group"><label class="form-label">${t('orderProductLabel')} *</label><input class="form-input" id="od-product" placeholder="e.g. 40D Ripstop Nylon"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">${t('orderQtyLabel')}</label><input class="form-input" id="od-qty" placeholder="e.g. 50,000 yards"></div>
+      <div class="form-group"><label class="form-label">${t('orderAmtLabel')}</label><input class="form-input" id="od-amt" type="number" placeholder="e.g. 45000"></div>
+    </div>`;
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveOrder('${custId}')">${t('save')}</button>`;
+  openModal();
+}
+async function saveOrder(custId) {
+  const product=el('od-product').value.trim(); if(!product){showToast('Product required','danger');return;}
+  const body={customer_id:custId,product,quantity:el('od-qty').value.trim(),amount:parseFloat(el('od-amt').value)||null};
+  if(SUPA.configured){try{const rows=await sbInsert('orders',body);if(rows&&rows[0])DB.orders.unshift(rows[0]);}catch(e){showToast('Save failed','danger');return;}}
+  else DB.orders.unshift({...body,id:genId(),created_at:new Date().toISOString()});
+  closeModal();renderDetailPanel(custId,'orders');showToast(t('orderAdded'),'success');
+}
+async function deleteOrder(id,custId) {
+  if(!isAdmin()) return;
+  if(SUPA.configured)try{await sbDelete('orders',id);}catch(e){showToast('Delete failed','danger');return;}
+  DB.orders=DB.orders.filter(x=>x.id!==id);
+  renderDetailPanel(custId,'orders');showToast('Deleted');
+}
+
+/* ================================================================
+   PRODUCTS PAGE
+   ================================================================ */
+function renderProducts() {
+  const list = DB.products;
+  el('page-content').innerHTML = `
+    <div class="page-header">
+      <div><div class="page-h1">${t('productsPage')}</div><div class="page-desc">${list.length} products</div></div>
+      ${isAdmin()?`<button class="btn btn-primary" onclick="openAddProduct()">+ ${t('addProduct')}</button>`:''}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;">
+      ${list.length===0?'<div style="color:var(--muted);padding:40px;text-align:center;grid-column:1/-1;">No products yet</div>':''}
+      ${list.map(p=>`<div class="card" style="cursor:pointer;" onclick="${isAdmin()?`openEditProduct('${p.id}')`:'void 0'}">
+        ${p.image_url?`<img src="${p.image_url}" style="width:100%;height:120px;object-fit:cover;border-radius:var(--r);margin-bottom:12px;" onerror="this.style.display='none'">`:'<div style="width:100%;height:80px;background:var(--warm-linen);border-radius:var(--r);margin-bottom:12px;display:flex;align-items:center;justify-content:center;font-size:28px;">🧵</div>'}
+        <div style="font-size:11px;color:var(--warm-orange);font-weight:600;letter-spacing:.04em;">${p.code||''}</div>
+        <div style="font-weight:600;margin:2px 0 4px;">${p.name||'—'}</div>
+        <div style="font-size:12px;color:var(--muted);">${p.category||''}</div>
+        ${p.composition?`<div style="font-size:11px;color:var(--mid);margin-top:4px;">${p.composition}</div>`:''}
+        ${p.feature?`<div style="margin-top:8px;font-size:11px;padding:4px 8px;background:var(--warm-linen);border-radius:var(--r-sm);color:var(--warm-deep);">${p.feature}</div>`:''}
+        ${isAdmin()?`<div style="margin-top:12px;display:flex;gap:6px;"><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openEditProduct('${p.id}')">Edit</button><button class="btn btn-danger-outline btn-sm" onclick="event.stopPropagation();deleteProduct('${p.id}')">Del</button></div>`:''}
+      </div>`).join('')}
+    </div>`;
+}
+function productForm(p) {
+  p=p||{};
+  return `
+    <div class="form-row"><div class="form-group"><label class="form-label">${t('productCode')}</label><input class="form-input" id="pr-code" value="${p.code||''}"></div>
+    <div class="form-group"><label class="form-label">${t('productName')} *</label><input class="form-input" id="pr-name" value="${p.name||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label class="form-label">${t('productCategory')}</label><input class="form-input" id="pr-cat" value="${p.category||''}" placeholder="e.g. Down Jacket Fabric"></div>
+    <div class="form-group"><label class="form-label">${t('productComposition')}</label><input class="form-input" id="pr-comp" value="${p.composition||''}" placeholder="e.g. 100% Nylon"></div></div>
+    <div class="form-group"><label class="form-label">${t('productFeature')}</label><input class="form-input" id="pr-feat" value="${p.feature||''}" placeholder="e.g. DWR, OEKO-TEX, Recycled"></div>
+    <div class="form-group"><label class="form-label">${t('productImageUrl')}</label><input class="form-input" id="pr-img" type="url" value="${p.image_url||''}" placeholder="https://…"></div>`;
+}
+function openAddProduct() {
+  el('modal-title').textContent=t('addProduct');
+  el('modal-body').innerHTML=productForm({});
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveNewProduct()">${t('save')}</button>`;
+  openModal();
+}
+function openEditProduct(id) {
+  const p=DB.products.find(x=>x.id===id); if(!p) return;
+  el('modal-title').textContent='Edit Product';
+  el('modal-body').innerHTML=productForm(p);
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveEditProduct('${id}')">${t('save')}</button>`;
+  openModal();
+}
+async function saveNewProduct() {
+  const name=el('pr-name').value.trim(); if(!name){showToast('Name required','danger');return;}
+  const body={code:el('pr-code').value.trim(),name,category:el('pr-cat').value.trim(),composition:el('pr-comp').value.trim(),feature:el('pr-feat').value.trim(),image_url:el('pr-img').value.trim()};
+  if(SUPA.configured){try{const rows=await sbInsert('products',body);if(rows&&rows[0])DB.products.unshift(rows[0]);}catch(e){showToast('Save failed','danger');return;}}
+  else DB.products.unshift({...body,id:genId(),created_at:new Date().toISOString()});
+  closeModal();renderProducts();showToast(t('productAdded'),'success');
+}
+async function saveEditProduct(id) {
+  const body={code:el('pr-code').value.trim(),name:el('pr-name').value.trim(),category:el('pr-cat').value.trim(),composition:el('pr-comp').value.trim(),feature:el('pr-feat').value.trim(),image_url:el('pr-img').value.trim()};
+  if(SUPA.configured){try{const rows=await sbUpdate('products',id,body);if(rows&&rows[0]){const i=DB.products.findIndex(x=>x.id===id);if(i>=0)DB.products[i]={...DB.products[i],...rows[0]};}}catch(e){showToast('Save failed','danger');return;}}
+  else{const i=DB.products.findIndex(x=>x.id===id);if(i>=0)DB.products[i]={...DB.products[i],...body};}
+  closeModal();renderProducts();showToast(t('productSaved'),'success');
+}
+async function deleteProduct(id) {
+  if(SUPA.configured)try{await sbDelete('products',id);}catch(e){showToast('Delete failed','danger');return;}
+  DB.products=DB.products.filter(x=>x.id!==id);
+  renderProducts();showToast(t('productDeleted'));
+}
+
+/* ================================================================
+   ACCOUNTS PAGE
+   ================================================================ */
+function renderAccounts() {
+  el('page-content').innerHTML = `
+    <div class="page-header">
+      <div><div class="page-h1">${t('accountMgmt')}</div><div class="page-desc">${STATE.accounts.length} accounts</div></div>
+      ${isSuperAdmin()?`<button class="btn btn-primary" onclick="openAddAccount()">+ ${t('addAccount')}</button>`:''}
+    </div>
+    ${STATE.accounts.map(acc=>`<div class="account-row" style="${acc.status==='active'?'':'opacity:.55;'}">
+      <div class="sidebar-avatar" style="background:${avatarColor(acc.name)};width:32px;height:32px;font-size:12px;border-radius:50%;">${initials(acc.name)}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:500;font-size:13px;">${acc.name} <span style="color:var(--muted);font-weight:400;">@${acc.username}</span></div>
+        <div style="font-size:11px;color:${acc.status==='active'?'var(--success)':'var(--danger)'};">${acc.status==='active'?t('accActive'):t('accDisabled')}</div>
+      </div>
+      ${roleBadge(acc.role)}
+      <div class="account-actions">
+        ${isSuperAdmin()&&acc.role!=='superadmin'?`
+          <button class="btn btn-secondary btn-sm" onclick="openEditAccount('${acc.id}')">Edit</button>
+          <button class="btn btn-secondary btn-sm" onclick="toggleAccStatus('${acc.id}')">${acc.status==='active'?t('accDisabled'):t('accActive')}</button>
+          <button class="btn btn-danger-outline btn-sm" onclick="deleteAcc('${acc.id}')">Del</button>
+        `:acc.role==='superadmin'?`<span class="badge badge-super">Protected</span>`:''}
+      </div>
+    </div>`).join('')}`;
+}
+function openAddAccount() {
+  el('modal-title').textContent=t('addAccount');
+  el('modal-body').innerHTML=accountForm({});
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveNewAccount()">${t('save')}</button>`;
+  openModal();
+}
+function openEditAccount(id) {
+  const acc=STATE.accounts.find(a=>a.id===id); if(!acc) return;
+  el('modal-title').textContent=t('editAccount');
+  el('modal-body').innerHTML=accountForm(acc);
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button><button class="btn btn-primary" onclick="saveEditAccount('${id}')">${t('save')}</button>`;
+  openModal();
+}
+function accountForm(acc) {
+  return `<div class="form-row"><div class="form-group"><label class="form-label">Username *</label><input class="form-input" id="fa-u" value="${acc.username||''}"></div>
+    <div class="form-group"><label class="form-label">Full Name *</label><input class="form-input" id="fa-n" value="${acc.name||''}"></div></div>
+    <div class="form-group"><label class="form-label">${t('newPassword')} ${acc.username?'(blank = keep)':'*'}</label><input class="form-input" id="fa-p" type="password"></div>
+    <div class="form-group"><label class="form-label">Role</label><select class="form-select" id="fa-r">
+      <option value="sales" ${acc.role==='sales'?'selected':''}>${t('sales')}</option>
+      ${isSuperAdmin()?`<option value="admin" ${acc.role==='admin'?'selected':''}>${t('admin')}</option>`:''}
+    </select></div>`;
+}
+async function saveNewAccount() {
+  const u=el('fa-u').value.trim(),n=el('fa-n').value.trim(),p=el('fa-p').value;
+  if(!u||!n||!p){showToast('All fields required','danger');return;}
+  if(STATE.accounts.find(a=>a.username===u)){showToast('Username taken','danger');return;}
+  STATE.accounts.push({id:genId(),username:u,password:p,role:el('fa-r').value,name:n,status:'active',createdAt:new Date().toISOString().slice(0,10),avatar:null});
+  await saveMeta();closeModal();renderAccounts();showToast(t('accountAdded'),'success');
+}
+async function saveEditAccount(id) {
+  const acc=STATE.accounts.find(a=>a.id===id); if(!acc) return;
+  const u=el('fa-u').value.trim(),n=el('fa-n').value.trim(),p=el('fa-p').value;
+  if(!u||!n){showToast('Username & name required','danger');return;}
+  if(STATE.accounts.find(a=>a.username===u&&a.id!==id)){showToast('Username taken','danger');return;}
+  acc.username=u;acc.name=n;acc.role=el('fa-r').value;if(p)acc.password=p;
+  await saveMeta();closeModal();renderAccounts();showToast(t('accountSaved'),'success');
+}
+async function toggleAccStatus(id) {
+  const acc=STATE.accounts.find(a=>a.id===id); if(!acc) return;
+  acc.status=acc.status==='active'?'disabled':'active';
+  await saveMeta();renderAccounts();
+}
+async function deleteAcc(id) {
+  STATE.accounts=STATE.accounts.filter(a=>a.id!==id);
+  await saveMeta();renderAccounts();showToast('Account removed');
+}
+
+/* ================================================================
+   SETTINGS PAGE
+   ================================================================ */
+function renderSettings() {
+  const s=STATE.settings;
+  el('page-content').innerHTML = `
+    <div class="page-header"><div><div class="page-h1">${t('settingsTitle')}</div><div class="page-desc">Super Admin only</div></div></div>
+
+    <div class="settings-card">
+      <div class="settings-card-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warm-orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><div class="settings-card-title">${t('myAccountSecurity')}</div></div>
+      <div class="settings-card-body">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">${t('newUsernameLabel')}</label><input class="form-input" id="acc-new-user" value="${STATE.currentUser.username}"></div>
+          <div class="form-group"><label class="form-label">${t('currentPasswordLabel')} *</label><input class="form-input" id="acc-cur-pass" type="password" placeholder="••••••••"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">${t('newPasswordLabelAcc')}</label><input class="form-input" id="acc-new-pass" type="password"></div>
+          <div class="form-group"><label class="form-label">${t('confirmPasswordLabel')}</label><input class="form-input" id="acc-conf-pass" type="password"></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:4px;"><button class="btn btn-primary btn-sm" onclick="saveMyCredentials()">${t('saveCredentials')}</button></div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="settings-card-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warm-orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/></svg><div class="settings-card-title">${t('branding')}</div></div>
+      <div class="settings-card-body">
+        <div class="form-group" style="margin-bottom:16px;"><label class="form-label">${t('companyLogo')}</label>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div id="logo-preview" style="width:56px;height:56px;border-radius:var(--r);overflow:hidden;background:var(--warm-orange);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:#fff;flex-shrink:0;">${s.logo?`<img src="${s.logo}" style="width:100%;height:100%;object-fit:cover;">`:'B'}</div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-secondary btn-sm" onclick="el('logo-file-input').click()">${t('uploadLogo')}</button>
+              ${s.logo?`<button class="btn btn-danger-outline btn-sm" onclick="removeLogo()">${t('removeLogo')}</button>`:''}
+            </div>
+            <input type="file" id="logo-file-input" accept="image/*" style="display:none" onchange="handleLogoFile(this)">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">${t('companyNameLabel')}</label><input class="form-input" id="s-name" value="${s.companyName}"></div>
+          <div class="form-group"><label class="form-label">${t('taglineLabel')}</label><input class="form-input" id="s-sub" value="${s.companySub}"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Login Tagline</label><input class="form-input" id="s-tagline" value="${s.tagline}"></div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="settings-card-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warm-orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/></svg><div class="settings-card-title">${t('headerFooter')}</div></div>
+      <div class="settings-card-body">
+        <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Header Text</label><input class="form-input" id="s-header" value="${s.headerText}"></div>
+        <div class="form-group"><label class="form-label">Footer Text</label><input class="form-input" id="s-footer" value="${s.footerText}"></div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="settings-card-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warm-orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><div class="settings-card-title">${t('policies')}</div></div>
+      <div class="settings-card-body">
+        <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Privacy Policy</label><textarea class="form-textarea" id="s-privacy" style="min-height:100px;font-size:12px;">${s.privacyPolicy}</textarea></div>
+        <div class="form-group"><label class="form-label">Security Policy</label><textarea class="form-textarea" id="s-security" style="min-height:100px;font-size:12px;">${s.securityPolicy}</textarea></div>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <div class="settings-card-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--warm-orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg><div class="settings-card-title">Supabase Database</div></div>
+      <div class="settings-card-body">
+        <p style="font-size:12px;color:var(--mid);margin-bottom:12px;">Status: <strong style="color:${SUPA.configured?'var(--success)':'var(--danger)'}">${SUPA.configured?'Connected — '+SUPA.url:'Not connected'}</strong></p>
+        <button class="btn btn-primary btn-sm" onclick="openSyncSettings()">Configure Database</button>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+      <button class="btn btn-primary" onclick="saveSettings()">${t('saveSettings')}</button>
+    </div>`;
+}
+
+async function saveSettings() {
+  STATE.settings.companyName=el('s-name').value;STATE.settings.companySub=el('s-sub').value;
+  STATE.settings.tagline=el('s-tagline').value;STATE.settings.headerText=el('s-header').value;
+  STATE.settings.footerText=el('s-footer').value;STATE.settings.privacyPolicy=el('s-privacy').value;
+  STATE.settings.securityPolicy=el('s-security').value;
+  await saveMeta();
+  el('login-company-name').textContent=STATE.settings.companyName;
+  el('login-company-sub').textContent=STATE.settings.companySub;
+  el('login-tagline').textContent=STATE.settings.tagline;
+  showToast(t('settingsSaved'),'success');
+}
+
+function handleLogoFile(input) {
+  const file=input.files&&input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image(); img.onload=function(){
+      const c=document.createElement('canvas');c.width=c.height=160;
+      const ctx=c.getContext('2d');const sc=Math.max(160/img.width,160/img.height);
+      ctx.drawImage(img,(160-img.width*sc)/2,(160-img.height*sc)/2,img.width*sc,img.height*sc);
+      STATE.settings.logo=c.toDataURL('image/png');
+      saveMeta();renderLogo();renderSettings();showToast('Logo updated','success');
+    }; img.src=e.target.result;
+  }; reader.readAsDataURL(file); input.value='';
+}
+async function removeLogo() { STATE.settings.logo=null; await saveMeta(); renderLogo(); renderSettings(); }
+
+async function saveMyCredentials() {
+  const me=STATE.currentUser;
+  const curPass=el('acc-cur-pass').value,newUser=el('acc-new-user').value.trim(),newPass=el('acc-new-pass').value,confPass=el('acc-conf-pass').value;
+  if(!curPass||curPass!==me.password){showToast(t('wrongCurrentPassword'),'danger');return;}
+  if(!newUser){showToast(t('usernameRequired'),'danger');return;}
+  if(STATE.accounts.find(a=>a.username===newUser&&a.id!==me.id)){showToast(t('usernameTakenMsg'),'danger');return;}
+  if(newPass&&newPass!==confPass){showToast(t('passwordMismatchMsg'),'danger');return;}
+  me.username=newUser;if(newPass)me.password=newPass;
+  await saveMeta();showToast(t('credentialsSavedMsg'),'success');
+}
+
+/* ================================================================
+   CSV EXPORT
+   ================================================================ */
+function exportCSV() {
+  if(!isSuperAdmin()){showToast('Super admin only','danger');return;}
+  const h=['Company','Country','Status','Level','Source','Website','Notes','Assigned To','Created','Follow-Ups','Quotations','Samples','Orders','Total Revenue'];
+  const rows=DB.customers.map(c=>[c.company_name,c.country,c.status,c.level,c.source,c.website,c.notes,salesName(c.assigned_to),c.created_at,custFollowUps(c.id).length,custQuotations(c.id).length,custSamples(c.id).length,custOrders(c.id).length,custOrders(c.id).reduce((s,o)=>s+(parseFloat(o.amount)||0),0)]);
+  let csv='\uFEFF'+h.map(x=>'"'+x+'"').join(',')+'\r\n';
+  rows.forEach(r=>{csv+=r.map(x=>'"'+(x||'').toString().replace(/"/g,'""')+'"').join(',')+'\r\n';});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`${STATE.settings.companyName}_CRM_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  showToast('Exported ✓','success');
+}
+
+/* ================================================================
+   MODAL & POLICY
+   ================================================================ */
+function openModal() { el('modal-overlay').classList.add('open'); }
+function closeModal() { el('modal-overlay').classList.remove('open'); }
+el('modal-overlay').addEventListener('click',e=>{if(e.target===el('modal-overlay'))closeModal();});
+function showPolicy(type) {
+  el('modal-title').textContent=type==='privacy'?t('privacy'):t('security');
+  el('modal-body').innerHTML=`<div class="policy-content">${type==='privacy'?STATE.settings.privacyPolicy:STATE.settings.securityPolicy}</div>`;
+  el('modal-footer').innerHTML=`<button class="btn btn-secondary" onclick="closeModal()">${t('close')}</button>`;
+  openModal();
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+async function initApp() {
+  renderLogo();
+  el('sidebar-username').textContent=STATE.currentUser.name;
+  el('sidebar-role').textContent=t(STATE.currentUser.role==='superadmin'?'superAdmin':STATE.currentUser.role==='admin'?'admin':'sales');
+  renderSidebarAvatar();
+  el('lbl-logout').textContent=t('signOut');
+  STATE.currentPage='dashboard';
+  renderSidebar();
+  renderSyncBarUI();
+  // Show loading skeleton while fetching
+  el('page-content').innerHTML=`<div style="padding:20px;"><div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row"></div><div class="skeleton skeleton-row" style="height:200px;margin-top:20px;"></div></div>`;
+  if(SUPA.configured){
+    const ok=await loadAllTables();
+    if(ok) connectRealtime();
+  }
+  renderDashboard();
+  el('topbar-title').textContent=t('nav_dashboard');
+  document.querySelectorAll('.topbar-lang-btn').forEach(b=>b.classList.toggle('active',b.textContent.trim()===(STATE.lang==='zh'?'中文':'EN')));
+  updateSidebarLabels();
+}
+
+/* ================================================================
+   BOOTSTRAP
+   ================================================================ */
+loadLocal();
+loadSupaConfig();
+renderLogo();
+el('login-company-name').textContent=STATE.settings.companyName;
+el('login-company-sub').textContent=STATE.settings.companySub;
+el('login-tagline').textContent=STATE.settings.tagline;
+setLang(STATE.lang);
+renderSyncBarUI();
+// Pre-fetch meta (accounts) so login works instantly if Supabase is configured
+if(SUPA.configured){
+  loadMeta().then(()=>{}).catch(()=>{});
+}
+</script>
+</body>
+</html>
